@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<title>个人周工作汇报记录</title>
+
+<script type="text/javascript" src="../js/hchart/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../js/modal/jquery.my-modal.1.1.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/modal/jquery.my-modal.1.1.winStyle.css" />
+
+<link rel="stylesheet" type="text/css" href="../css/week_ work_record.css" />
+<script type="text/javascript" src="../js/week_ work_record.js"></script>
+<script type="text/javascript" src="../js/personChooser.js"></script>
+<script src="../js/BeAlert.js"></script>
+<link href="../css/BeAlert2.css" type="text/css" rel="stylesheet"/>
+</head>
+	<body>
+		 <div class="main_xzk">
+          <!--  <span class="right_top">个人周工作汇报记录</span>-->
+            <div class="xzk">
+                <span class="ziti">请选择周</span>
+                <select class="xialakuang" id="weekSelect">
+                </select>
+            </div>
+            <div class="xzk">
+                <input name="" type="button" id="createTable" onclick="onGetWeekCapacity()" class="content_button" style="width: 138px;" onmouseover="this.className='content_button2'" onmouseout="this.className='content_button'" value="查阅周工作汇报详情"/>
+            </div>
+            
+        </div>
+        
+    <!--右边下面表格内容区-->
+        <div class="biaogequ">
+            <div class="box_top">
+                        <span class="ziti">&nbsp;&nbsp;&nbsp;姓名</span>
+                    <input type="text" id="names" onclick="onCyberOpenChoosePersonWidget()" class="input_box"> &nbsp;&nbsp;&nbsp;
+                    <span class="ziti">项目</span>
+                    <select class="xialakuang" id="objectSelect">
+                        <option>全部项目</option>
+                    </select>&nbsp;&nbsp;&nbsp;
+                    <input class="jxscsrw" type="checkbox" id="checkBox"/><span class="ziti">仅显示超时任务</span>
+                    <input type="button" value="筛选" class="content_button" onclick="screening()" onmouseover="this.className='content_button2'"
+                    onmouseout="this.className='content_button'" />
+                    </div>
+                <div class="xuanzeshijian">
+            	
+                <button class="jt_l" onclick="leftTab()" id="preDate"></button>
+                <p class="p" id="dateShow"></p>
+                <button class="jt_r" onclick="rightTab()" id="nextDate"></button>
+                <p class="p">周工时汇报详情</p>
+            </div>
+            
+            <div>
+                
+                <table class="box table" cellspacing="0" cellpadding="0">
+				<thead>
+					<tr class="table_teb">
+						<td style="width: 4%">姓名</td>
+						<td style="width: 10%">项目</td>
+						<td style="width: 4%">任务编号</td>
+						<td style="width: 15%">任务名称</td>
+						<td style="width: 5%">预计开始日期</td>
+						<td style="width: 5%">实际开始日期</td>
+						<td style="width: 5%">预计截止日期</td>
+						<td style="width: 4%">预计总工时</td>
+						<td style="width: 4%">周耗费工时</td>
+						<td style="width: 4%">总耗费工时</td>
+						<td style="width: 4%">任务状态</td>
+						<td style="width: 4%">汇总周工时</td>
+					</tr>
+				</thead>
+				<tbody id="tBody">
+					<tr class="bg_color"></tr>
+				</tbody>
+			</table>
+            </div>
+        </div>
+        
+		<!-- 模态框区域 -->
+<!-- 	<div class="m-modal">
+		<div class="m-modal-dialog">
+			<div class="m-top">
+				<h4 class="m-modal-title">
+					个人筛选
+				</h4>
+				<span class="m-modal-close" onclick="closeModal()">&times;</span>
+			</div>
+			<br>
+			<div class="m-bottom">
+				<span style="margin-left: 35px;font-size: 9px;color: gray;">已选</span>
+				<button class="m-btn-cancel" onclick="closeModal()">取消</button>
+				<button class="m-btn-sure" onclick="closeModal()">确定</button>
+			</div>
+			<div class="m-middle" style="width:auto; height:140px; overflow:auto;">
+				<table border="1" cellspacing="0" cellpadding="2px" id="empChooseTable"
+					style="text-align: center;margin: 0 auto;width: 500px;font-size: 8px;">
+				</table>
+			</div>
+			<hr style="size: 1px;color: black;">
+			<div style="margin-left: 40px">
+				姓名 <input type="text" id="filterName"/>
+				<button onclick="onCyberRecordFilter()"> 筛 选 </button>
+			</div>
+			<div class="m-middle" style="width:auto; height:180px; overflow:auto;">
+				<table border="1" cellspacing="0" cellpadding="2px" id="empTable"
+					style="text-align: center;margin: 0 auto;width: 500px;font-size: 8px;">
+				</table>
+			</div>
+		</div>
+	</div> -->
+	<div class="m-modal">
+		<div class="m-modal-dialog">
+			<div class="m-top">
+				<h4 class="m-modal-title">
+					个人筛选
+					<span class="m-bottom">
+						<button class="m-btn-cancel">取消</button>
+						<button class="m-btn-sure">确定</button>
+					</span>
+				</h4>
+			</div>
+			<div id="empChooseDiv" class="m-middle" style="width:auto; height:140px; overflow:auto;">
+				<!--content-->
+				<table border="1" cellspacing="0" cellpadding="2px" id="empChooseTable" class="table2"></table>
+			</div>
+			<hr style="size: 1px;color: black;">
+			<div style="margin-left: 40px;margin-top: 10px">
+				姓 名 <input class="input_box" type="text" id="filterName"/>
+				<button style="height: 30px;text-align: center;font-size: 14px;border-radius:5px;background-color: #04b8dc;
+					width: 80px;color: white;cursor: pointer;margin-left: 20px" onclick="onCyberRecordFilter()"> 筛 选 </button>
+			</div>
+			<div id="empDiv" class="m-middle" style="width:auto; height:340px; overflow:auto;">
+				<!--content-->
+				<table border="1" cellspacing="0" cellpadding="2px" id="empTable" class="table2"></table>
+			</div>
+		</div>
+	</div>
+	</body>
+</html>

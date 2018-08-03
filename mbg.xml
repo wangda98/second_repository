@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+
+	<context id="DB2Tables" targetRuntime="MyBatis3">
+		<commentGenerator>
+			<property name="suppressAllComments" value="true" />
+		</commentGenerator>
+		<!-- 配置数据库连接 -->
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+			connectionURL="jdbc:mysql://10.0.0.10:3306/pms_mofun_bak" 
+			userId="mofun"
+			password="mymofun168">
+		</jdbcConnection>
+
+		<javaTypeResolver>
+			<property name="forceBigDecimals" value="false" />
+		</javaTypeResolver>
+
+		<!-- 指定javaBean生成的位置 -->
+		<javaModelGenerator targetPackage="com.cyberwise.workanalysis.bean"
+			targetProject=".\src\main\java">
+			<property name="enableSubPackages" value="true" />
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+
+		<!--指定sql映射文件生成的位置 -->
+		<sqlMapGenerator targetPackage="com.cyberwise.workanalysis.mapper" targetProject=".\src\main\java">
+			<property name="enableSubPackages" value="true" />
+		</sqlMapGenerator>
+
+		<!-- 指定dao接口生成的位置，mapper接口 -->
+		<javaClientGenerator type="XMLMAPPER"
+			targetPackage="com.cyberwise.workanalysis.mapper" targetProject=".\src\main\java">
+			<property name="enableSubPackages" value="true" />
+		</javaClientGenerator>
+
+
+		<!-- table指定每个表的生成策略 -->
+		<table tableName="cb_st_project_per_capacity" domainObjectName="ProjectPerCapacity"></table>
+		<table tableName="cb_st_svn" domainObjectName="Svn"></table>
+		<table tableName="cb_st_work_capacity" domainObjectName="WorkCapacity"></table>
+		<table tableName="cb_st_work_capacity2" domainObjectName="WorkCapacity2"></table>
+		<table tableName="cb_st_work_info_for_week" domainObjectName="WorkInfoForWeek"></table>
+		<table tableName="cb_st_work_record_in_task" domainObjectName="WorkRecordInTask"></table>
+		<table tableName="cb_st_worker_percent_cpl" domainObjectName="WorkerPercentCpl"></table>
+	</context>
+</generatorConfiguration>

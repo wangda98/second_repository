@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>团队周工作负载情况对比分析</title>
+<!-- hchart -->
+<script type="text/javascript" src="../js/hchart/jquery-1.8.3.min.js"></script>
+<link href="../css/member_evaluate_manage.css" type="text/css"
+	rel="stylesheet" />
+	<link rel="stylesheet" href="../css/BeAlert.css">
+	 <script src="../js/BeAlert.js"></script>
+<script type="text/javascript">
+	var bigItemsList = {};
+	var dateText; //获取选择框里的文本
+	var dateId;
+	var dateSend = 0; //发送选中的数据的postId
+	var dateSend1 = "请选择员工"; //发送选中的数据的name
+	var tableData; //接收到的表格数据
+	var url;   
+	$(function() {
+		onCyberPageLoad();
+		//select选中事件选中专业信息
+		$("#memberSelect").change(function() {
+			dateSend1 =  $("#memberSelect option:selected").text();
+		});
+		$("#projectSelect").change(function() {
+			dateSend  = $(this).val();
+			dateText =  $("#projectSelect option:selected").text();
+		});
+	});
+	//编辑评分版本
+	var edit = function(self) {
+		 var pskillId=$(self).attr("pskillId") ;
+		 window.location.href="person_skill_score_manage.html?type=2&pskillId="+pskillId;
+	}
+	//查看评分版本详情
+	var detail = function(self) {
+		 var pskillId=$(self).attr("pskillId") ;
+		 window.location.href="person_skill_score_manage.html?type=1&pskillId="+pskillId;
+	}
+	//新增评分版本
+	var add1 = function(self) {
+		   if(dateSend1=="请选择员工"){
+				 alert("请在下拉框中选择员工")
+				 return;
+			 }else if(dateSend==0){
+				 alert("请在下拉框中选择启用项目")
+				 return;
+			 }
+		   confirm("", "确认是否添加 ["+dateSend1+"] 到  ["+dateText+"]", function (isConfirm) {
+               if (isConfirm) {
+            	   var data={};
+    			   data.name=dateSend1;
+    			   data.postId=dateSend;
+    			   var urlString="../service/personSkill/addPersonSkill";
+    			   addInfo(urlString,data)//添加信息
+    			   queryTable()//显示添加的信息 
+               } else {
+               }
+           }, {confirmButtonText: '确认', cancelButtonText: '取消', width: 400});
+	}
+	//用来执行增加
+	function addInfo(urlString,data){
+		$.ajax({
+			type : "POST",
+			url : urlString,
+			data : data,
+			success : function(r) {
+				if (r.code == 1) {
+					queryTable()//刷新列表
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+	//打开页面加载专业选项信息(默认为全部)
+	function onCyberPageLoad() {
+		//调用查询员工接口
+		$.ajax({
+			type : "POST",
+			url : "../service/workanalysis/getUserPostInfo",
+			data : {},
+			success : function(r) {
+				if (r.code == 1) {
+					pro = r.result;
+					for ( var i in pro) {
+						var userId = pro[i].userId;
+						var realname = pro[i].realname;
+						var postName = pro[i].postName;
+						 
+							$("#memberSelect").append(
+									'<option value=' + userId + '>' + realname
+											+ '</option>');
+					}
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+		//调用查询专业接口
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/getAllPostProfessional",
+			data : {},
+			success : function(r) {
+				if (r.code == 1) {
+					pro = r.result;
+					//alert(weekDate);
+					for ( var i in pro) {
+						var id = pro[i].id;
+						var realname = pro[i].realname;
+						var professional = pro[i].professional;
+						var type = pro[i].type;
+						if (type == 1) {
+							$("#projectSelect").append(
+									'<option value=' + id + '>' + professional
+											+ '</option>');
+						}
+					}
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+
+	//点击查询按钮获取选中的专业信息
+	function queryTable() {
+		   if(dateSend1=="请选择员工"){
+			 alert("请在下拉框中选择员工")
+			 return;
+		 }else if(dateSend==0){
+			 alert("请在下拉框中选择启用项目")
+			 return;
+		 }
+		$("#loading_image").show();
+		$("#tableDiv").hide();
+		ajaxGetData();
+	}
+
+	//发送创建表格请求
+	function ajaxGetData() {
+		$.ajax({
+			type : "POST",
+			url : "../service/personSkill/findPersonSkillByName ",
+			data : {
+				'postId' : dateSend,'name':dateSend1
+			},
+			success : function(r) {
+				if (r.code == 1) {
+					tableData = r.result;
+					createTable(tableData);
+					$("#loading_image").hide();
+					$("#tableDiv").show();
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+
+	//创建表单
+	function createTable(data) {
+		var table = $("#dataTable");
+		//清空表格
+		$("#dataTable tr:not(.biaotou)").empty();
+		$("#dataTable tr:not(.biaotou)").each(function() {
+			$(this).remove();
+		})
+		 
+		for ( var i in data) {
+			var id = data[i].id;
+			var name = data[i].name;
+			var createTime = data[i].createTime;
+			var updateTime= data[i].updateTime;
+			var removeFlag = data[i].removeFlag;
+			var caozuo = ""; //操作
+			if(i==0){
+				caozuo = "<span class='caozuo' pskillId="+id+" onclick='edit(this)'>编辑&emsp;</span><span class='caozuo'  pskillId="+id+" onclick='detail(this)'>查看</span>"
+			}else{
+				caozuo = "<span class='caozuo' pskillId="+id+" onclick='detail(this)'>查看</span>"
+			}
+			var skillId = data[i].skillId;
+			var myTotalScore =data[i].myTotalScore;
+			var totalScore = data[i].totalScore;
+				var tr;
+				if (i % 2 == 0) {
+					tr = $("<tr style='background-color: #f7f7f7;'></tr>");
+				} else {
+					tr = $("<tr style='background-color: #ffffff;'></tr>");
+				}
+				tr.appendTo(table);
+				var temp = '<td>'
+						+ name
+						+ '</td>'
+						+ '<td>'
+						+ totalScore
+						+ '</td>'
+						+ '<td>'
+						+ myTotalScore
+						+ '</td>'
+						+ '<td>'
+						+ createTime
+						+ '</td>'
+						+ '<td>'
+						+ updateTime
+						+ '</td>'
+						+ '<td style="color:blue">'
+						+ caozuo
+						+ '</td>'
+						tr.append(temp)
+		 
+			
+		}
+	}
+</script>
+</head>
+
+<body>
+	<!--右边上面选项区-->
+	<div class="main_xzk" style="height:58px">
+		<div class="xzk1">
+			<select class="xialakuang" id="memberSelect" style="padding-left: 78px;">
+				<option value=0 selected="selected">请选择员工</option>
+			</select>
+		</div>
+		<div class="xzk1">
+			<select class="xialakuang" id="projectSelect" style="padding-left:47px;">
+				<option value=0 selected="selected">请选择启用项目 </option>
+			</select>
+		</div>
+		<div class="xzk">
+			<input name="" type="button" id="createTable"
+				onclick="queryTable()" class="content_button"
+				onmouseover="this.className='content_button2'"
+				onmouseout="this.className='content_button'" value="查看">
+				<input name="" type="button"  
+				onclick="add1()" class="content_button1"
+				onmouseover="this.className='content_button12'"
+				onmouseout="this.className='content_button1'" value="新增">
+		</div>
+	</div>
+	<!--右边下面表格内容区-->
+	<div class="biaogequ" style="min-height: 798px;">
+		<!--操作按钮区-->
+		<div class="b" >
+		<div id="loading_image"  hidden="hidden" style="display:none;">
+	 	</div>
+			<div id="tableDiv">
+				<table class="box table" cellspacing="0" cellpadding="0" id="dataTable">
+					<tr class="biaotou">
+						<th>员工名称</th>
+						<th>项目总分</th>
+						<th>我的总分</th>
+						<th>创建时间</th>
+						<th>更新时间</th>
+						<th>操作        </th>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

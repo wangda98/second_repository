@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>周工作负载情况对比分析</title>
+
+<!-- hchart -->
+<script type="text/javascript" src="../js/hchart/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../js/hchart/highcharts.js"></script>
+<script type="text/javascript" src="../js/hchart/exporting.js"></script>
+<script type="text/javascript" src="../js/hchart/highcharts-zh_CN.js"></script>
+<!-- <script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script> -->
+<link href="../css/zhougongzuo.css" type="text/css" rel="stylesheet"/>
+<script src="../js/BeAlert.js"></script>
+<link href="../css/BeAlert2.css" type="text/css" rel="stylesheet"/>
+<script type="text/javascript">
+	var weekDate; //周数组
+	var dateIndex;
+	var dateSend; //发送的周数据
+	var tableData;
+	var chart;	//定义全局chart
+	$(function(){ 
+		//initChart();
+		onCyberPageLoad();
+		$(".reportBtn:eq(0)").css("background","white");
+		$("#chartDiv").hide();
+		
+		//一上来需要隐藏
+		$("#nextDate").attr("disabled", true); 
+		
+		//select选中事件
+		$("#weekSelect").change(function(){
+			dateSend = $(this).val();
+		 	//alert($(this).val());
+		});
+		
+		$("#tableButton").click(function(){ 
+			$("#tableButton").css("background","white");
+			$("#chartButton").css("background","#e4f3f6");
+			$("#chartDiv").hide();
+			$("#tableDiv").show();
+		}); 
+		
+		$("#chartButton").click(function(){ 
+			$("#chartButton").css("background","white");
+			$("#tableButton").css("background","#e4f3f6");
+			$("#chartDiv").show();
+			$("#tableDiv").hide();
+		});
+		
+	}); 
+	
+	//打开加载周信息
+	function onCyberPageLoad(){
+		$.ajax({
+			type : "POST",
+			url : "../service/workanalysis/getWeeksOfAnalysis",
+			data : {},
+			success : function(r) {
+				if(r.code == 1){
+					weekDate = r.result;
+					//alert(weekDate);
+					for(var i in weekDate){
+						if(i == weekDate.length-1){
+							$("#weekSelect").append("<option selected>"+weekDate[i]+"</option>");
+							$("#dateShow").text(weekDate[i]);
+							dateIndex = i;
+							dateSend = weekDate[i];
+							ajaxGetData();
+						}else{
+							$("#weekSelect").append("<option>"+weekDate[i]+"</option>");
+						}
+					}
+				}else{
+					alert(r.msg);
+				}
+			}
+		});
+	}
+	
+	//左切换
+	function onGetPrevWeekCapacity(){
+		dateSend = weekDate[--dateIndex];
+		$("#dateShow").text(dateSend);
+		$("#nextDate").attr("disabled", false); 
+		if(dateIndex == 0){
+			$("#preDate").attr("disabled", true); 
+		}
+		synSelect(dateSend);
+		ajaxGetData();
+	}
+	
+	//右切换
+	function onGetNextWeekCapacity(){
+		dateSend = weekDate[++dateIndex];
+		$("#dateShow").text(dateSend);
+		$("#preDate").attr("disabled", false); 
+		if(dateIndex == weekDate.length-1){
+			$("#nextDate").attr("disabled", true); 
+		}
+		synSelect(dateSend);
+		ajaxGetData();
+	}
+	
+	//点击查询按钮
+	function onGetWeekCapacity(){
+		ajaxGetData();
+	}
+	
+	//初始化表格
+	function initChart(){
+		chart = {
+			 chart: {
+		            type: 'column'
+		        },
+		        title: {
+		            text: ''
+		        },
+		        xAxis: {
+		        	categories: []
+		        },
+		        yAxis: {
+		            allowDecimals: false,
+		            min: 0,
+		            title: {
+		                text: '负载百分比'
+		            }
+		        },
+		        tooltip: {
+		            formatter: function () {
+		                return '<b>' + this.x + '</b><br/>' +
+		                    this.series.name + ': ' + this.y + '<br/>' +
+		                    '总和: ' + this.point.stackTotal;
+		            }
+		        },
+		        plotOptions: {
+		            column: {
+		                stacking: 'normal'
+		            }
+		        },
+		        series: [],
+		        credits: {  
+		            enabled: false     //不显示LOGO 
+		        }  
+			}	
+	}
+	
+	//发送创建表格请求
+	function ajaxGetData(){
+		$.ajax({
+			type : "POST",
+			url : "../service/workanalysis/getWeekCapacity",
+			data : {'date':dateSend},
+			success : function(r) {
+				if(r.code == 1){
+					tableData = r.result;
+					createTable(tableData);
+					createChart(tableData);
+				}else{
+					alert(r.msg);
+				}
+			}
+		});
+	}
+	
+	//创建表单
+	function createTable(data){
+		var table = $("#dataTable");
+		//清空表单
+		$("#dataTable tr").empty();
+		$("#dataTable tr").each(function(){
+			$(this).remove();
+		})
+		for (var i in data) {
+			var tr;
+			if(i%2==0){
+				if(i==0){
+					tr=$("<tr style='background-color: #f7f7f7;height:22px;line-height:22px;'></tr>");	
+				}else{
+					tr=$("<tr style='background-color: #f7f7f7;'></tr>");
+				}
+			}else{
+				tr=$("<tr style='background-color: #ffffff;'></tr>");
+			}
+	        tr.appendTo(table);
+	        //alert(data[i]);
+			for (var j in data[i]) {
+				if(i>0 && j>0){
+					var td=$("<td>"+data[i][j]+"%"+"</td>");
+				}else{
+					var td=$("<td>"+data[i][j]+"</td>");
+				}
+		        td.appendTo(tr);
+			}
+		}
+	}
+	
+	//创建表格
+	function createChart(empData){
+		initChart();
+		//alert(chart.series)
+		//填充x列 为员工姓名
+		for(var i in empData){
+			for (var j in empData[i]) {
+				if(j==0 && i>0){
+					chart.xAxis.categories[i-1] = empData[i][j];
+				}
+			}
+		}
+		
+		//填充name
+		for (var i in empData[0]) {
+			if(i>0 && i<empData[0].length-1){
+				chart.series[i-1] = {'name':'','data':[]};
+				chart.series[i-1].name = empData[0][i];
+			}
+		}
+		
+		//chart.series[0].data[0] = 1;
+		
+		//填充data
+ 		for(var i in empData){
+			for (var j in empData[i]) {
+				if(i>0 && j>0 && j<empData[i].length-1){
+					//注意要转换成浮点类型
+					chart.series[j-1].data[i-1] = parseFloat(empData[i][j]);
+				}
+			}
+		}
+		
+ 		//alert(chart.xAxis.categories);
+		//alert(chart.series[1].data);
+		//alert(chart.series);
+		showChart();
+	}
+	
+	function showChart(){
+		$('#container').highcharts(chart);
+	}
+	
+	
+	function synSelect(selectDate){
+		$("#weekSelect option").each(function() {  
+	        if ($(this).text() == selectDate) {  
+                $(this).attr("selected", "selected");  
+	        }  
+	    }); 
+	}
+	
+</script>
+</head>
+<body>
+	  <!--右边上面选项区-->
+      <div class="main_xzk" style="height: 60px">
+           <div class="xzk">
+               <span class="ziti">请选择周</span>
+               <select class="xialakuang" id="weekSelect"></select>
+           </div>
+           <div class="xzk">
+               <input name="" type="button" id="createTable" onclick="onGetWeekCapacity()" class="content_button"  onmouseover="this.className='content_button2'" onmouseout="this.className='content_button'" value="生成统计报表">
+           </div>
+       </div>
+       <!--右边下面表格内容区-->
+       <div class="biaogequ" style="min-height: 815px;">
+           <div class="xuanzeshijian" >
+               <button class="jt_l" id="preDate" onclick="onGetPrevWeekCapacity()"></button>
+               <p class="p" id="dateShow"><!-- 2017-10-01 ～ 2017-10-07 --></p>
+               <button class="jt_r" id="nextDate" onclick="onGetNextWeekCapacity()"></button>
+               <p class="p">周工作情况</p>
+           </div>
+           
+           <div class="box">
+               <div class="box_bg">
+                   <button class="reportBtn teb_ziti" id="tableButton" style="width: 15%;">列 表</button>
+                   <button class="reportBtn teb_ziti" id="chartButton" style="width: 15%;">图 示</button>
+               </div>
+               <div id="tableDiv">
+               		<table class="box table" id="dataTable" cellspacing="0" cellpadding="0"></table>
+               </div>
+               <div id="chartDiv">
+			   		<div id="container" style="height:400px;"></div>
+			   </div>
+           </div>
+       </div>
+</body>
+</html>

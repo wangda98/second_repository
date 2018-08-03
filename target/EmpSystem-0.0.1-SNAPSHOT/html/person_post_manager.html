@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>岗位分配管理</title>
+<!--win风格-->
+<link rel="stylesheet" type="text/css" href="../css/modal/jquery.my-modal.1.1.winStyle.css" />
+<script type="text/javascript" src="../js/modal/jquery.my-modal.1.1.js"></script>
+<script type="text/javascript" src="../js/include.js"></script>
+<link href="../css/zhougongzuo.css" type="text/css" rel="stylesheet"/>
+<link href="../css/gerenbiaoxianqushichaxun.css" type="text/css" rel="stylesheet"/>
+<!-- hchart -->
+<script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+<script src="../js/BeAlert.js"></script>
+<link href="../css/BeAlert2.css" type="text/css" rel="stylesheet"/>
+<script>
+	var m1;
+	var uid;
+	var puid;
+	var type;
+	$(function() {
+		m1 = new MyModal.modal(function() {
+			var pid = '';
+			$(".choosePostName").each(function(){
+				if($(this).prop("checked"))
+					pid = $(this).val();
+			})
+			if(pid != ''){
+				if(type==1){
+					addPostUser(uid,pid);
+				}else if(type==2){
+					updatePostUser(puid,pid);
+				}
+			}
+		});
+		
+		loadPerson();
+		loadPostUser();
+	});
+
+	//加载员工与岗位信息
+	function loadPostUser() {
+		//获取员工
+ 		$.ajax({
+			type : "POST",
+			url : "../service/userpost/findPostUserList",
+			data : {},
+			success : function(r) {
+				if(r.code == 1){
+					//清空表单
+					$("#postTable tr:gt(0)").each(function(){
+						$(this).remove();
+					})
+					var table = $("#postTable");
+					for(var i in r.result){
+						var tr;
+						if(i%2==0)
+							tr=$("<tr puid="+r.result[i].id+" stati="+r.result[i].joinToStati
+									+" style='background:#f5f5f5'></tr>");
+						else
+							tr=$("<tr puid="+r.result[i].id+" stati="+r.result[i].joinToStati+"></tr>");
+				        tr.appendTo(table);
+				        var td=$("<td>"+r.result[i].realname+"</td>");
+				        td.appendTo(tr);
+				        var td=$("<td>"+r.result[i].postName+"</td>");
+				        td.appendTo(tr);
+				        var td=$("<td></td>");
+				        td.appendTo(tr);
+				        if(r.result[i].joinToStati==1){
+				        	var p=$("<p class='ziti1 dianjiziti2' onclick='updateStati(this)'>取消均线统计</p>");
+			    			p.appendTo(td);
+				        }else{
+				        	var p=$("<p class='ziti1 dianjiziti2' onclick='updateStati(this)'>加入均线统计</p>");
+			    			p.appendTo(td);
+				        }
+				        var td=$("<td></td>");
+				        td.appendTo(tr);
+				        var p=$("<p class='ziti1 dianjiziti1' onclick='updatePost(this)'>修改岗位 </p>");
+		    			p.appendTo(td);
+		    			var p=$("<p class='ziti1 dianjiziti1' onclick='deletePost(this)'>删除</p>");
+		    			p.appendTo(td);
+					}
+				}else{
+					alert(r.msg);
+				}
+			}
+		}); 
+	}
+	
+	//修改岗位
+	function updatePost(p){
+		trNode = $(p).parent().parent();
+		puid = trNode.attr('puid');
+		type = 2;
+		m1.show();
+	}
+	
+	function updatePostUser(puid,pid){
+		$.ajax({
+			type : "POST",
+			url : "../service/userpost/updatePostUserPost",
+			data : {"id":puid,"pid":pid},
+			success : function(r) {
+				if(r.code == 1){
+					loadPostUser();
+					pid='';
+				}else{
+					alert(r.msg);
+				}
+			}
+		}); 
+	}
+	
+	//删除postUser
+	function deletePost(p){
+		 confirm("是否删除该员工职位数据？", "", function (isConfirm) {
+             if (isConfirm) {
+            	 trNode = $(p).parent().parent();
+     			var id = trNode.attr('puid');
+     			
+     			$.ajax({
+     				type : "POST",
+     				url : "../service/userpost/deletePostUser",
+     				data : {"id":id},
+     				success : function(r) {
+     					if(r.code == 1){
+     						loadPostUser();
+     						loadPerson();
+     					}else{
+     						alert(r.msg);
+     					}
+     				}
+     			}); 
+             } else {
+                 //after click the cancel
+             }
+         }, {confirmButtonText: '是', cancelButtonText: '否', width: 400});
+	}
+	
+	//修改均线
+	function updateStati(p){
+		 confirm("是否修改该员工的均线数据？", "", function (isConfirm) {
+             if (isConfirm) {
+            	 trNode = $(p).parent().parent();
+     			var id = trNode.attr('puid');
+     			var joinToStati = trNode.attr('stati');
+     			if(joinToStati == 1)
+     				joinToStati = 0;
+     			else
+     				joinToStati = 1;
+     			
+     			$.ajax({
+     				type : "POST",
+     				url : "../service/userpost/updatePostUserStati",
+     				data : {"id":id,"joinToStati":joinToStati},
+     				success : function(r) {
+     					if(r.code == 1){
+     						loadPostUser();
+     					}else{
+     						alert(r.msg);
+     					}
+     				}
+     			}); 
+             } else {
+                 //after click the cancel
+             }
+         }, {confirmButtonText: '是', cancelButtonText: '否', width: 400});
+	}
+	
+	//加载员工
+	function loadPerson() {
+		//获取员工
+ 		$.ajax({
+			type : "POST",
+			url : "../service/userpost/findUserList",
+			data : {},
+			success : function(r) {
+				if(r.code == 1){
+					//清空表单
+					$("#personTable tr").each(function(){
+						$(this).remove();
+					})
+					var table = $("#personTable");
+					for(var i in r.result){
+						var tr;
+						if(i%2==0)
+							tr=$("<tr style='background:#f5f5f5'></tr>");
+						else
+							tr=$("<tr></tr>");
+				        tr.appendTo(table);
+				        var td=$("<td style='text-align:left;'>"+ 
+			        		"<input type='radio' class='choosePerson' style='margin:0 10px 0 30px'"+
+			        		" name='choosePerson' value='"+r.result[i].id+"'/>"+
+			        		r.result[i].realname+"</td>");
+				        td.appendTo(tr);
+					}
+				}else{
+					alert(r.msg);
+				}
+			}
+		}); 
+	}
+	
+	//选择岗位
+	function postChoose() {
+		uid = '';
+		$(".choosePerson").each(function(){
+			if($(this).prop("checked")){
+				uid = $(this).val();
+			}
+		});
+		if(uid != ''){
+			type = 1;
+			m1.show();
+		}else{
+			alert("请先选择要添加岗位的员工！");
+			//alert("请先选择要添加岗位的员工！", "", function () {
+                //after click the confirm button, will run this callback function
+            //}, {type: 'warning', confirmButtonText: 'OK'});
+		}
+	}
+	
+	//添加岗位人员
+	function addPostUser(uid,pid){
+		$.ajax({
+			type : "POST",
+			url : "../service/userpost/addPostUser",
+			data : {"uid":uid,"pid":pid},
+			success : function(r) {
+				if(r.code == 1){
+					loadPerson();
+					loadPostUser();
+					uid = '';
+				}else{
+					alert(r.msg);
+				}
+			}
+		}); 
+	}
+	
+	//加载岗位
+	function loadPost(){
+		var type = $("#postSelect").val();
+		//清空表单
+		$("#postNameTable tr").each(function(){
+			$(this).remove();
+		})
+		if(type != 0){
+			$.ajax({
+				type : "POST",
+				url : "../service/userpost/findPostName",
+				data : {"type":type},
+				success : function(r) {
+					if(r.code == 1){
+						var table = $("#postNameTable");
+						for(var i in r.result){
+							var tr;
+							if(i%2==0)
+								tr=$("<tr style='background:#f5f5f5'></tr>");
+							else
+								tr=$("<tr></tr>");
+					        tr.appendTo(table);
+					        var td=$("<td style='text-align:left;'>"+ 
+				        		"<input type='radio' class='choosePostName' style='margin:0 10px 0 180px'"+
+				        		" name='choosePostName' value='"+r.result[i].pid+"'/>"+
+				        		r.result[i].postName+"</td>");
+					        td.appendTo(tr);
+						}
+					}else{
+						alert(r.msg);
+					}
+				}
+			}); 
+		}
+	}
+</script>
+</head>
+<body>
+    <!--下面表格内容区-->
+    <div class="biaogequ" id="biaogequ" style="min-height: 885px;">
+	    <div style="padding-top: 20px">
+	    	<span class="box3" style="width: 18%;float: left;">
+	    		<p class="spanP">员工选择表</p>
+	    		<button class="top1" onclick="postChoose()"><span>添加岗位</span></button>
+	    		<span style="height:350px;overflow:auto;float: left;">
+	     			<table class="box5 table4" id="personTable" border="1" cellspacing="0" cellpadding="0"></table>
+	     		</span>
+	    	</span>
+	    	<span class="box3" style="width: 74%;float: left;">
+	    		<p class="spanP">岗位明细表</p>
+	    		<span style="height:395px;overflow:auto;float: left;">
+	    			<table class="box5 table5" id="postTable" border="1" cellspacing="0" cellpadding="0">
+	    				<tr>
+	    					<td	width="20%">姓 名</td>
+	    					<td width="30%">岗位名称</td>
+	    					<td width="30%">统计均线</td>
+	    					<td width="20%">操 作</td>
+	    				</tr>
+	    			</table>
+	    		</span>
+	    	</span>
+	    </div>
+    </div>
+    <!-- 模态框区域 -->
+	<div class="m-modal">
+		<div class="m-modal-dialog">
+			<div class="m-top">
+				<h4 class="m-modal-title">
+					岗位筛选
+					<span class="m-bottom">
+						<button class="m-btn-cancel">取消</button>
+						<button class="m-btn-sure">确定</button>
+					</span>
+				</h4>
+			</div>
+			<div style="margin: 8px auto;text-align: center;">
+				<span class="ziti2">请选岗位：</span>
+               	<select class="xialakuang3" id="postSelect" onchange="loadPost()">
+               		<option value="0">请选择...</option>
+               		<option value="1">开 发</option>
+               		<option value="2">产 品</option>
+               		<option value="3">测 试</option>
+               		<option value="4">项 目</option>
+               	</select>
+               	<div class="m-middle" style="width:auto; height:340px; overflow:auto;">
+					<!--content-->
+					<table border="1" cellspacing="0" cellpadding="2px" id="postNameTable" class="table2"></table>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

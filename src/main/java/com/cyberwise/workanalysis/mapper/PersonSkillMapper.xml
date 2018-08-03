@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyberwise.workanalysis.mapper.PersonSkillMapper">
+
+	<select id="findPersonSkillByNameAndPostId" resultMap="PersonSkillResultMap">
+		<!-- select * from tb_cyber_skill_person where name=#{name} -->
+		select p.id,name,version,p.create_time,update_time,create_person,use_times,status,post_id,skill_id,professional post_name
+		from tb_cyber_skill_person p,tb_cyber_skill s,tb_cyber_post_professional post
+		where skill_id=s.id and post.id=post_id and name=#{name} and post_id=#{postId} order by update_time desc
+	</select>
+	
+	<select id="findPersonSkillByName" resultMap="PersonSkillResultMap">
+		<!-- select * from tb_cyber_skill_person where name=#{name} -->
+		select p.id,name,version,p.create_time,update_time,create_person,use_times,status,post_id,skill_id,professional post_name
+		from tb_cyber_skill_person p,tb_cyber_skill s,tb_cyber_post_professional post
+		where skill_id=s.id and post.id=post_id and name=#{name} order by update_time desc
+	</select>
+	
+	<select id="findPersonSkillByNameWithDate" resultMap="PersonSkillResultMap">
+		select p.id,name,version,p.create_time,update_time,create_person,use_times,status,post_id,skill_id,professional post_name
+		from tb_cyber_skill_person p,tb_cyber_skill s,tb_cyber_post_professional post
+		where skill_id=s.id and post.id=post_id and name=#{name} and update_time&gt;#{startDate} and update_time&lt;=#{endDate}
+		order by update_time asc
+	</select>
+	
+	<select id="findPersonSkillById" resultMap="PersonSkillResultMap">
+		<!-- select * from tb_cyber_skill_person where id=#{id} -->
+		select p.id,name,version,p.create_time,update_time,create_person,use_times,status,post_id,skill_id,professional post_name
+		from tb_cyber_skill_person p,tb_cyber_skill s,tb_cyber_post_professional post 
+		where skill_id=s.id and post.id=post_id and p.id=#{id} order by update_time desc
+	</select>
+	
+	<select id="findAllPersonSkill" resultMap="PersonSkillResultMap">
+		<!-- select * from tb_cyber_skill_person -->
+		select p.id,name,version,p.create_time,update_time,create_person,use_times,status,post_id,skill_id,professional post_name
+		from tb_cyber_skill_person p,tb_cyber_skill s,tb_cyber_post_professional post 
+		where skill_id=s.id and post.id=post_id order by update_time desc
+	</select>
+	
+	<resultMap type="com.cyberwise.workanalysis.bean.PersonSkill" id="PersonSkillResultMap">
+		<!-- 不指定id则id传过去gruop的id就为空了 -->
+		<id column="id" property="id" />
+		<association property="personBigItems" select="findPersonBigItems"
+			column="id"></association>
+	</resultMap>
+	
+	<select id="findPersonBigItems" resultMap="PersonSkillBigItemResultMap">
+		<!-- select * from
+		tb_cyber_skill_big_item_person where person_id = #{id} -->
+		select pb.id,name,type,skill_id,person_id,big_id from tb_cyber_skill_big_item_person pb,tb_cyber_skill_big_item p
+		where big_id=p.id and person_id=#{id}
+	</select>
+	
+	<resultMap type="com.cyberwise.workanalysis.bean.PersonSkillBigItem"
+		id="PersonSkillBigItemResultMap">
+		<!-- 不指定id则id传过去gruop的id就为空了 -->
+		<id column="id" property="id" />
+		<association property="personSmallItems" select="findPersonSmallItems"
+			column="id"></association>
+	</resultMap>
+	
+	<select id="findPersonSmallItems" resultType="com.cyberwise.workanalysis.bean.PersonSkillSmallItem">
+		<!-- select * from
+		tb_cyber_skill_small_item_person where pbig_id = #{id} -->
+		select ps.id,name,score,pbig_id,small_id,my_score from tb_cyber_skill_small_item_person ps,tb_cyber_skill_small_item p
+		where small_id=p.id and pbig_id=#{id}
+	</select>
+	
+	<select id="findSkillIdByPostId" resultType="java.lang.Integer">
+		select id from tb_cyber_skill where `status`=1 and post_id=#{postId}
+	</select>
+	
+	<insert id="addPersonSkill" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_cyber_skill_person
+		values(#{id},#{name},#{createTime},#{updateTime},#{skillId})
+	</insert>
+	
+	<insert id="addPersonSkillBig" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_cyber_skill_big_item_person
+		values(#{id},#{bigId},#{personId})
+	</insert>
+	
+	<insert id="addPersonSkillSmall" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_cyber_skill_small_item_person
+		values(#{id},#{myScore},#{pbigId},#{smallId})
+	</insert>
+	
+	<update id="updateUseTimes">
+		update tb_cyber_skill set use_times = #{useTimes} where id = #{id}
+	</update>
+	
+	<update id="updateMyScore">
+		update tb_cyber_skill_small_item_person set my_score = #{myScore} where id = #{id}
+	</update>
+	
+	<update id="updateUpdateTime">
+		update tb_cyber_skill_person set update_time = #{time} where id = #{id}
+	</update>
+</mapper>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>技能管理页面</title>
+<script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+<link href="../css/zhougongzuo.css" type="text/css" rel="stylesheet"/>
+<link href="../css/gerenbiaoxianqushichaxun.css" type="text/css" rel="stylesheet"/>
+<script src="../js/BeAlert.js"></script>
+<link href="../css/BeAlert2.css" type="text/css" rel="stylesheet"/>
+<script type="text/javascript">
+	var type; // 1查看 2修改
+	var pskillId;
+	var skillType = 0; // 种类 1人际沟通 2基础技能 3高级技能 0总表
+	var pbigId;
+	var pname;
+	
+	//一上来加载
+	$(function(){
+		//alert(getUrlParam("type"));
+		$(".reportBtn:eq(0)").attr("disabled", true);
+		$(".reportBtn:eq(0)").css("background","white");
+		$("#tableDiv2").hide();
+		
+		onLoad();
+	})
+	
+	//获取url值的方法 
+	function getUrlParam(name){  
+	    //构造一个含有目标参数的正则表达式对象  
+	    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");  
+	    //匹配目标参数  
+	    var r = window.location.search.substr(1).match(reg);  
+	    //返回参数值  
+	    if (r!=null) return unescape(r[2]);  
+	    return null;  
+	} 
+	
+	//初始化
+	function onLoad(){
+		type = getUrlParam("type");
+		pskillId = getUrlParam("pskillId");
+		loadtable();
+	}
+	
+	//加载总表
+	function loadtable(){
+		$.ajax({
+			type : "POST",
+			url : "../service/personSkill/loadTotal",
+			data : {"id":pskillId},
+			success : function(r) {
+				pname = r.msg;
+				if(type == 1){
+					$("#showTitle1").text("查看打分表");
+					$("#showTitle2").text("当前被查看的用户：" + pname);
+				}else if(type == 2){
+					$("#showTitle1").text("编辑打分表");
+					$("#showTitle2").text("当前被编辑的用户：" + pname);
+				}
+				//清空表单
+				$("#showTotle tr:gt(0)").each(function(){
+					$(this).remove();
+				})
+				var table = $("#showTotle");
+				for ( var i in r.result) {
+					var tr=$("<tr></tr>");
+			        tr.appendTo(table);
+			        for ( var j in r.result[i]) {
+			        	var td=$("<td>"+r.result[i][j]+"</td>");
+			            td.appendTo(tr);
+			        }
+				}
+			}
+		});
+	}
+	
+	//加载大项目表 
+	function loadBigTable(){
+		$.ajax({
+			type : "POST",
+			url : "../service/personSkill/loadBigTable",
+			data : {"id":pskillId,"skillType":skillType},
+			success : function(r) {
+				//清空表单
+				$("#bigItemTable tr:gt(0)").each(function(){
+					$(this).remove();
+				})
+				var table = $("#bigItemTable");
+				var t1 = 0;
+				var t2 = 0;
+				var t3 = 0;
+				for (var i in r.result) {
+					t1 += r.result[i].smallItemNum;
+					t2 += r.result[i].myTotalScore;
+					t3 += r.result[i].totalScore;
+					var tr=$("<tr></tr>");
+			        tr.appendTo(table);
+		        	var td=$("<td style='text-align:left;'>"+ 
+		        		"<input type='radio' style='margin:0 5px 0 20px'"+
+		        		" name='chooseSmall' onchange='loadSmallTable(this)' value='"+r.result[i].id+"'/>"+
+		        		r.result[i].name+"</td>");
+		            td.appendTo(tr);
+		            var td=$("<td>"+r.result[i].smallItemNum+"</td>");
+		            td.appendTo(tr);
+		            var td=$("<td>"+r.result[i].myTotalScore+"</td>");
+		            td.appendTo(tr);
+		            var td=$("<td>"+r.result[i].totalScore+"</td>");
+		            td.appendTo(tr);
+				}
+				//合计
+				var tr=$("<tr></tr>");
+		        tr.appendTo(table);
+	        	var td=$("<td>合计</td>");
+	            td.appendTo(tr);
+	            var td=$("<td>"+t1+"</td>");
+	            td.appendTo(tr);
+	            var td=$("<td>"+t2+"</td>");
+	            td.appendTo(tr);
+	            var td=$("<td>"+t3+"</td>");
+	            td.appendTo(tr);
+				showRadio();
+			}
+		});
+	}
+	
+	//加载小项目表
+	function loadSmallTable(bigItem){
+		pbigId = $(bigItem).val();
+		loadSmallItemTable();
+	}
+	
+	//加载小项目表
+	function loadSmallItemTable(){
+		$.ajax({
+			type : "POST",
+			url : "../service/personSkill/loadSmallTable",
+			data : {"id":pskillId,"pbigId":pbigId},
+			success : function(r) {
+				//清空表单
+				$("#smallItemTable tr:gt(0)").each(function(){
+					$(this).remove();
+				})
+				var table = $("#smallItemTable");
+				for ( var i in r.result) {
+					var tr=$("<tr smallItemId='"+r.result[i].id+"'></tr>");
+			        tr.appendTo(table);
+		        	var td=$("<td style='text-align:left;padding-left:15px;'>"+r.result[i].name+"</td>");
+		            td.appendTo(tr);
+		            var td=$("<td>"+r.result[i].score+"</td>");
+		            td.appendTo(tr);
+		            var td=$("<td style='padding-left:15px;'></td>");
+		            td.appendTo(tr);
+		            if(type == 1){
+			            var input=$("<input type='number' min='0' max='"+r.result[i].score
+			            		+"' style='width:50%' readonly='readonly' value='"+r.result[i].myScore+"'/>");
+			            input.appendTo(td);
+		            }else if(type == 2){
+		            	var input=$("<input type='number' min='0' max='"+r.result[i].score
+			            		+"' style='width:50%' value='"+r.result[i].myScore+"'/>");
+			            input.appendTo(td);
+		            }
+		            var td;
+		            if(type == 1){
+		            	td=$("<td>无</td>");
+		            }else if(type == 2){
+		            	td=$("<td></td>");
+		            	var p=$("<p class='ziti1 dianjiziti1' onclick='saveSmallItem(this)'>保存</p>");
+		    			p.appendTo(td);
+		            }
+		            td.appendTo(tr);
+				}
+			}
+		});
+		$("#smallItemTable").show();
+	}
+	
+	//保存小项
+	function saveSmallItem(val){
+		confirm("是否对该分数进行修改？", "", function (isConfirm) {
+			 if (isConfirm) {
+				var trNode = $(val).parent().parent();
+				var smallItemId = trNode.attr("smallItemId");
+				var myScore = trNode.find("input").eq(0).val();
+				
+				$.ajax({
+					type : "POST",
+					url : "../service/personSkill/updateMyScore",
+					data : {"pskillId":pskillId,"smallId":smallItemId,"myScore":myScore},
+					success : function(r) {
+						loadBigTable();
+						loadSmallItemTable();
+					}
+				});
+            }else{
+                //after click the cancel
+        }
+            }, {confirmButtonText: '是', cancelButtonText: '否', width: 400});
+	}
+	
+	//点击分项目报表切换标签
+	function btnSwitch(btn){
+		pbigId = 0;
+		skillType = $(btn).val();
+		$(".reportBtn").attr("disabled", false);
+		$(".reportBtn").css("background","#e4f3f6");
+		$(btn).attr("disabled", true);
+		$(btn).css("background","white");
+		if(skillType == 0){
+			loadtable();
+			$("#tableDiv1").show();
+			$("#tableDiv2").hide();
+		}else{
+			loadBigTable();
+			$("#tableDiv2").show();
+			$("#tableDiv1").hide();
+			$("#smallItemTable").hide();
+		}
+		$("#bigItemTable :radio").each(function(){
+			$(this).attr('checked', false);
+		})
+	}
+	
+	//刷新后radio显示
+	function showRadio(){
+		$("#bigItemTable :radio").each(function(){
+			if($(this).val()==pbigId){
+				//alert(bigId);
+				$(this).attr('checked', 'checked');
+			}
+		})
+	}
+	
+</script>
+</head>
+<body>
+	<!--右边上面选项区-->
+    <div class="main_xzk h" style="height: 80px;">
+    	<span class="right_top1" id="showTitle1" style="margin-top: 10px">查看打分表</span>
+    	<span class="right_top2" id="showTitle2"></span>
+    </div>
+
+	<!--右边下面表格内容区-->
+    <div class="biaogequ" id="biaogequ" style="min-height: 795px;">
+        <div class="box">
+            <div class="box_bg" id="buttonDiv">
+           		<button class="reportBtn teb_ziti" onclick="btnSwitch(this)" style="width: 25%;" value="0">总表</button>
+           		<button class="reportBtn teb_ziti" onclick="btnSwitch(this)" style="width: 25%;" value="1">人际沟通</button>
+           		<button class="reportBtn teb_ziti" onclick="btnSwitch(this)" style="width: 25%;" value="2">基础技能</button>
+           		<button class="reportBtn teb_ziti" onclick="btnSwitch(this)" style="width: 25%;" value="3">高级技能</button>
+            </div>
+            <div id="tableDiv1">
+            	<table class="box2 table3" id="showTotle" border="1" cellspacing="0" cellpadding="0">
+            		<tr>
+            			<td> 类 别 </td>
+            			<td>评分小项数</td>
+            			<td>我 的 得 分</td>
+            			<td> 总 分 </td>
+            		</tr>
+            	</table>
+            </div>
+            <div id="tableDiv2">
+            	<span class="box3" style="width: 35%">
+            		<p class="spanP">个人评分大项</p>
+            		<table class="box4 table3" id="bigItemTable" border="1" cellspacing="0" cellpadding="0">
+	            		<tr>
+	            			<td width="50%"> 大 项 </td>
+	            			<td width="20%">小项数</td>
+	            			<td width="15%"> 得 分 </td>
+	            			<td width="15%"> 总 分 </td>
+	            		</tr>
+            		</table>
+            	</span>
+            	<span class="box3" style="width: 58%">
+            		<p class="spanP">个人评分小项</p>
+            		<table class="box4 table3" id="smallItemTable" border="1" cellspacing="0" cellpadding="0">
+	            		<tr>
+	            			<td width="40%"> 小 项 </td>
+	            			<td width="20%">标 准 分</td>
+	            			<td width="20%"> 得 分 </td>
+	            			<td width="20%"> 操 作 </td>
+	            		</tr>
+            		</table>
+            	</span>
+            </div>
+    	</div> 
+    </div>
+</body>
+</html>

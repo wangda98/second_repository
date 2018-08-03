@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>技能管理页面</title>
+<script type="text/javascript" src="../js/jquery-1.9.1.min.js"></script>
+<link href="../css/zhougongzuo.css" type="text/css" rel="stylesheet"/>
+<link href="../css/gerenbiaoxianqushichaxun.css" type="text/css" rel="stylesheet"/>
+<script src="../js/BeAlert.js"></script>
+<link href="../css/BeAlert2.css" type="text/css" rel="stylesheet"/>
+<script type="text/javascript">
+	var type; // 1新增 2修改 3查看
+	var skillId;
+	var postId;
+	var skillType = 0; // 种类 1人际沟通 2基础技能 3高级技能 0总表
+	var bigId;
+	var bigItemFlag = 0;//是否能添加大项
+	var smallItemFlag = 0;//是否能添加小项
+	
+	//一上来加载
+	$(function(){
+		//alert(getUrlParam("type"));
+		$(".reportBtn:eq(0)").attr("disabled", true);
+		$(".reportBtn:eq(0)").css("background","white");
+		$("#tableDiv2").hide();
+		
+		onLoad();
+	})
+	
+	//初始化
+	function onLoad(){
+		type = getUrlParam("type");
+		postId = getUrlParam("postId");
+		if(type == 1){
+			$("#biaogequ").hide();
+		}else if(type == 2){
+			skillId = getUrlParam("id");
+			$("#functionBtn").val("修改");
+			$("#showTitle1").text("编辑评分表");
+			loadSkillInfo();
+			loadtable1();
+		}else if(type == 3){
+			skillId = getUrlParam("id");
+			$("#functionBtn").hide();
+			$(".top1").hide();
+			$("#versionInput").attr("readonly","readonly");
+			$("#nameInput").attr("readonly","readonly");
+			$("#showTitle1").text("查看评分表");
+			loadSkillInfo();
+			loadtable1();
+		}
+		
+		//加载postname
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/getPostName",
+			data : {"postId":postId},
+			success : function(r) {
+				$("#showTitle2").text("专业方向："+r.result);
+			}
+		});
+	}
+	
+	//加载skill信息
+	function loadSkillInfo(){
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/getSkillById",
+			data : {"id":skillId},
+			success : function(r) {
+				$("#versionInput").val(r.result.version);
+				$("#nameInput").val(r.result.createPerson);
+			}
+		});
+	}
+	
+	//加载总表
+	function loadtable1(){
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/loadTotal",
+			data : {"id":skillId},
+			success : function(r) {
+				//清空表单
+				$("#showTotle tr:gt(0)").each(function(){
+					$(this).remove();
+				})
+				var table = $("#showTotle");
+				for ( var i in r.result) {
+					var tr=$("<tr></tr>");
+			        tr.appendTo(table);
+			        for ( var j in r.result[i]) {
+			        	var td=$("<td>"+r.result[i][j]+"</td>");
+			            td.appendTo(tr);
+			        }
+				}
+			}
+		});
+	}
+	
+	//加载大项目表 
+	function loadBigTable(){
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/loadBigTable",
+			data : {"id":skillId,"type":skillType},
+			success : function(r) {
+				//清空表单
+				$("#bigItemTable tr:gt(0)").each(function(){
+					$(this).remove();
+				})
+				var table = $("#bigItemTable");
+				var t1 = 0;
+				var t2 = 0;
+				for ( var i in r.result) {
+					t1 += r.result[i].smallItemNum;
+					t2 += r.result[i].totalScore;
+					var tr=$("<tr></tr>");
+			        tr.appendTo(table);
+		        	var td=$("<td style='text-align:left;'>"+ "<input type='radio' name='chooseSmall' onchange='loadSmallTable(this)' value='"+r.result[i].id+"'/>"
+		        			+r.result[i].name+"</td>");
+		            td.appendTo(tr);
+		            var td=$("<td>"+r.result[i].smallItemNum+"</td>");
+		            td.appendTo(tr);
+		            var td=$("<td>"+r.result[i].totalScore+"</td>");
+		            td.appendTo(tr);
+				}
+				//合计
+				var tr=$("<tr></tr>");
+		        tr.appendTo(table);
+	        	var td=$("<td>合计</td>");
+	            td.appendTo(tr);
+	            var td=$("<td>"+t1+"</td>");
+	            td.appendTo(tr);
+	            var td=$("<td>"+t2+"</td>");
+	            td.appendTo(tr);
+				showRadio();
+			}
+		});
+	}
+	
+	//加载小项目表 1
+	function loadSmallTable(bigItem){
+		bigId = $(bigItem).val();
+		loadSmallItemTable();
+	}
+	
+	//加载小项目表
+	function loadSmallItemTable(){
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/loadSmallTable",
+			data : {"id":skillId,"bigId":bigId},
+			success : function(r) {
+				//清空表单
+				$("#smallItemTable tr:gt(0)").each(function(){
+					$(this).remove();
+				})
+				var table = $("#smallItemTable");
+				for ( var i in r.result) {
+					var tr=$("<tr smallItemId='"+r.result[i].id+"'></tr>");
+			        tr.appendTo(table);
+		        	var td=$("<td style='text-align:left;padding-left:15px;'></td>");
+		            td.appendTo(tr);
+		            var input=$("<input type='text' style='width:85%' readonly='readonly' value='"+r.result[i].name+"'/>");
+		            input.appendTo(td);
+		            var td=$("<td style='padding-left:15px;'></td>");
+		            td.appendTo(tr);
+		            var input=$("<input type='number' min='1' style='width:50%' readonly='readonly' value='"+r.result[i].score+"'/>");
+		            input.appendTo(td);
+		            var td;
+		            if(type == 3){
+		            	td=$("<td>无</td>");
+		            }else if(type == 2){
+		            	td=$("<td></td>");
+		            	var p=$("<p class='ziti1 dianjiziti1' onclick='editSmallItem(this)'>编辑</p>");
+		    			p.appendTo(td);
+		    			var p=$("<p class='ziti1 dianjiziti1' onclick='deleteSmallItem(this)'>删除</p>");
+		    			p.appendTo(td);
+		            }
+		            td.appendTo(tr);
+				}
+			}
+		});
+		if(type != 3){
+			$("#smallItemBtn").show();
+		}
+		$("#smallItemTable").show();
+	}
+	
+	//获取url值的方法 
+	function getUrlParam(name){  
+	    //构造一个含有目标参数的正则表达式对象  
+	    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");  
+	    //匹配目标参数  
+	    var r = window.location.search.substr(1).match(reg);  
+	    //返回参数值  
+	    if (r!=null) return unescape(r[2]);  
+	    return null;  
+	} 
+	
+	//保存或者修改
+	function saveOrEdit(){
+		if(type == 1){
+			var version = $("#versionInput").val();
+			var name = $("#nameInput").val();
+			version = $.trim(version);
+			name = $.trim(name);
+			if(version==''||name==''){
+				alert("创始人和版本号不能为空！");
+			}else{
+				$.ajax({
+					type : "POST",
+					url : "../service/skill/addSkill",
+					data : {"version":version,"createPerson":name,"postId":postId},
+					success : function(r) {
+						if(r.code==1){
+							 window.location.href=r.result;
+						}else{
+							alert(r.message);
+						}
+					}
+				});
+			}
+		}else if(type == 2){
+			var version = $("#versionInput").val();
+			var name = $("#nameInput").val();
+			version = $.trim(version);
+			name = $.trim(name);
+			if(version==''||name==''){
+				alert("创始人和版本号不能为空！");
+			}else{
+				$.ajax({
+					type : "POST",
+					url : "../service/skill/updateSkill",
+					data : {"version":version,"createPerson":name,"id":skillId,"postId":postId},
+					success : function(r) {
+						if(r.code==1){
+							 window.location.href=r.result;
+						}else{
+							alert(r.message);
+						}
+					}
+				});
+			}
+		}
+	}
+	
+	//点击分项目报表切换标签
+	function btnSwitch(btn){
+		bigItemFlag = 0;
+		skillType = $(btn).val();
+		$(".reportBtn").attr("disabled", false);
+		$(".reportBtn").css("background","#e4f3f6");
+		$(btn).attr("disabled", true);
+		$(btn).css("background","white");
+		if(skillType == 0){
+			loadtable1();
+			$("#tableDiv1").show();
+			$("#tableDiv2").hide();
+		}else{
+			loadBigTable();
+			$("#tableDiv2").show();
+			$("#tableDiv1").hide();
+			$("#smallItemBtn").hide();
+			$("#smallItemTable").hide();
+		}
+	}
+	
+	//添加大项按键
+	function addBigItemBtn(){
+		if(bigItemFlag == 0){
+			bigItemFlag = 1;
+			var table = $("#bigItemTable");
+			var tr=$("<tr></tr>");
+	        tr.appendTo(table);
+        	var td=$("<td style='text-align: left;'><input type='text' style='width:85%' placeholder='请输入名称' id='bigItemInputName'/></td>");
+            td.appendTo(tr);
+            var td=$("<td colspan='2'></td>");
+			var p=$("<p class='ziti1 dianjiziti1' onclick='addBigItem()'>添加</p>");
+			p.appendTo(td);
+			var p=$("<p class='ziti1 dianjiziti1' onclick='quitBigItem()'>取消</p>");
+			p.appendTo(td);
+            td.appendTo(tr);
+		}
+	}
+	
+	//取消
+	function quitBigItem(){
+		$("#bigItemTable tr:last").remove();
+		bigItemFlag = 0;
+	}
+	
+	//添加
+	function addBigItem(){
+		var name = $("#bigItemInputName").val();
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/addBigItem",
+			data : {"skillId":skillId,"name":name,"type":skillType},
+			success : function(r) {
+				bigId=0;
+				loadBigTable();
+				//删除后隐藏小项
+				$("#smallItemBtn").hide();
+				$("#smallItemTable").hide();
+			}
+		});
+		bigItemFlag = 0;
+	}
+	
+	//删除大项
+	function removeBigItemBtn(){
+		confirm("您是否删除该大项？", "", function (isConfirm) {
+            if (isConfirm) {
+            	$.ajax({
+    				type : "POST",
+    				url : "../service/skill/removeBigItem",
+    				data : {"skillId":skillId,"id":bigId},
+    				success : function(r) {
+    					if(r.code == 1){
+    						loadBigTable();
+    						//删除后隐藏小项
+    						$("#smallItemBtn").hide();
+    						$("#smallItemTable").hide();
+    					}else{
+    						alert(r.msg);
+    					}
+    				}
+    			});
+            } else {
+                //after click the cancel
+            }
+        }, {confirmButtonText: '是', cancelButtonText: '否', width: 400});
+	}
+	
+	//添加小项按键
+	function addSmallItemBtn(){
+		if(smallItemFlag == 0){
+			smallItemFlag = 1;
+			var table = $("#smallItemTable");
+			var tr=$("<tr></tr>");
+	        tr.appendTo(table);
+        	var td=$("<td style='text-align: left;'><input type='text' style='width:85%' placeholder='请输入名称' id='smallItemInputName'/></td>");
+            td.appendTo(tr);
+            var td=$("<td style='text-align:left;padding-left:15px;'><input type='number' min='1' style='width:50%' placeholder='分值' id='smallItemInputScore'/></td>");
+            td.appendTo(tr);
+            var td=$("<td></td>");
+			var p=$("<p class='ziti1 dianjiziti1' onclick='addSmallItem()'>添加</p>");
+			p.appendTo(td);
+			var p=$("<p class='ziti1 dianjiziti1' onclick='quitSmallItem()'>取消</p>");
+			p.appendTo(td);
+            td.appendTo(tr);
+		}
+	}
+	
+	//取消
+	function quitSmallItem(){
+		$("#smallItemTable tr:last").remove();
+		smallItemFlag = 0;
+	}
+	
+	//添加
+	function addSmallItem(){
+		var name = $("#smallItemInputName").val();
+		var score = $("#smallItemInputScore").val();
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/addSmallItem",
+			data : {"skillId":skillId,"name":name,"score":score,"bigId":bigId},
+			success : function(r) {
+				loadBigTable();
+				loadSmallItemTable();
+			}
+		});
+		smallItemFlag = 0;
+	}
+	
+	//编辑小项
+	function editSmallItem(val){
+		var trNode = $(val).parent().parent();
+		$(val).parent().remove();
+		
+		var td=$("<td></td>");
+		td.appendTo(trNode);
+		var p=$("<p class='ziti1 dianjiziti1' onclick='saveSmallItem(this)'>保存</p>");
+		p.appendTo(td);
+		var p=$("<p class='ziti1 dianjiziti1' onclick='quitEdit(this)'>取消</p>");
+		p.appendTo(td);
+		
+		trNode.find("input").removeAttr("readonly");
+	}
+	
+	//保存小项
+	function saveSmallItem(val){
+		var trNode = $(val).parent().parent();
+		var smallItemId = trNode.attr("smallItemId");
+		var name = trNode.find("input").eq(0).val();
+		var score = trNode.find("input").eq(1).val();
+		
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/updateSmallItem",
+			data : {"skillId":skillId,"id":smallItemId,"name":name,"score":score},
+			success : function(r) {
+				loadBigTable();
+				loadSmallItemTable();
+			}
+		});
+	}
+	
+	//放弃编辑
+	function quitEdit(val){
+		loadSmallItemTable();
+	}
+	
+	//删除小项
+	function deleteSmallItem(val){
+		var smallItemId = $(val).parent().parent().attr("smallItemId");
+		confirm("您是否删除该小项？", "", function (isConfirm) {
+            if (isConfirm) {
+            	$.ajax({
+    				type : "POST",
+    				url : "../service/skill/removeSmallItem",
+    				data : {"skillId":skillId,"id":smallItemId},
+    				success : function(r) {
+    					loadBigTable();
+    					loadSmallItemTable();
+    				}
+    			});
+            } else {
+                //after click the cancel
+            }
+        }, {confirmButtonText: '是', cancelButtonText: '否', width: 400});
+	}
+	
+	//刷新后radio显示
+	function showRadio(){
+		$("#bigItemTable :radio").each(function(){
+			if($(this).val()==bigId){
+				//alert(bigId);
+				$(this).attr('checked', 'checked');
+			}
+		})
+	}
+</script>
+</head>
+<body>
+	<!--右边上面选项区-->
+    <div class="main_xzk h" style="height: 110px;">
+    	<span class="right_top1" id="showTitle1">新建评分表</span>
+    	<span class="right_top2" id="showTitle2">专业方向：安卓客户端开发</span>
+        <div class="xzk w_21">
+            <span class="ziti">版本号</span>
+            <input class="input_box" type="text" id="versionInput"/>
+        </div>
+        <div class="xzk w_21">
+            <span class="ziti">创建人</span>
+            <input class="input_box" type="text" id="nameInput"/>
+        </div>
+        <div class="xzk">
+            <input name="" type="button" class="content_button"  onmouseover="this.className='content_button2'"
+             onmouseout="this.className='content_button'" id="functionBtn" onclick="saveOrEdit()" value="保存">
+        </div>
+    </div>
+
+	<!--右边下面表格内容区-->
+    <div class="biaogequ" id="biaogequ" style="min-height: 765px;">
+        <div class="box">
+            <div class="box_bg" id="buttonDiv">
+           		<button class="reportBtn teb_ziti" onclick="btnSwitch(this)" style="width: 25%;" value="0">总表</button>
+           		<button class="reportBtn teb_ziti" onclick="btnSwitch(this)" style="width: 25%;" value="1">人际沟通</button>
+           		<button class="reportBtn teb_ziti" onclick="btnSwitch(this)" style="width: 25%;" value="2">基础技能</button>
+           		<button class="reportBtn teb_ziti" onclick="btnSwitch(this)" style="width: 25%;" value="3">高级技能</button>
+            </div>
+            <div id="tableDiv1">
+            	<table class="box2 table3" id="showTotle" border="1" cellspacing="0" cellpadding="0">
+            		<tr>
+            			<td> 类 别 </td>
+            			<td>评分小项数</td>
+            			<td> 总 分 </td>
+            		</tr>
+            	</table>
+            </div>
+            <div id="tableDiv2">
+            	<span class="box3" style="width: 30%">
+            		<p class="spanP">评分大项管理</p>
+            		<button class="top1" onclick="addBigItemBtn()"><span>新增大项</span></button>
+            		<button class="top1" onclick="removeBigItemBtn()"><span>删除大项</span></button>
+            		<table class="box4 table3" id="bigItemTable" border="1" cellspacing="0" cellpadding="0">
+	            		<tr>
+	            			<td width="60%"> 大 项 </td>
+	            			<td width="20%">小项数</td>
+	            			<td width="20%"> 总 分 </td>
+	            		</tr>
+            		</table>
+            	</span>
+            	<span class="box3" style="width: 60%">
+            		<p class="spanP">评分小项管理</p>
+            		<button class="top1" id="smallItemBtn" onclick="addSmallItemBtn()"><span>新增小项</span></button>
+            		<table class="box4 table3" id="smallItemTable" border="1" cellspacing="0" cellpadding="0">
+	            		<tr>
+	            			<td width="60%"> 小 项 </td>
+	            			<td width="20%"> 标 准 </td>
+	            			<td width="20%"> 操 作 </td>
+	            		</tr>
+            		</table>
+            	</span>
+            </div>
+    	</div> 
+    </div>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyberwise.workanalysis.mapper.SkillManageMapper">
+
+	<select id="findAllPostProfessional" resultType="com.cyberwise.workanalysis.bean.PostProfessional">
+		select * from
+		tb_cyber_post_professional
+	</select>
+
+	<select id="findAllSkill" resultMap="SkillResultMap">
+		select * from tb_cyber_skill
+		where remove_flag = 0
+	</select>
+
+	<select id="findSkillByPostId" resultMap="SkillResultMap">
+		select * from
+		tb_cyber_skill where remove_flag = 0 and post_id = #{id}
+	</select>
+
+	<resultMap type="com.cyberwise.workanalysis.bean.Skill" id="SkillResultMap">
+		<!-- 不指定id则id传过去gruop的id就为空了 -->
+		<id column="id" property="id" />
+		<association property="bigItems" select="findBigItems"
+			column="id"></association>
+	</resultMap>
+	<select id="findBigItems" resultMap="SkillBigItemResultMap">
+		select * from
+		tb_cyber_skill_big_item where remove_flag = 0 and skill_id = #{id}
+	</select>
+
+	<resultMap type="com.cyberwise.workanalysis.bean.SkillBigItem"
+		id="SkillBigItemResultMap">
+		<!-- 不指定id则id传过去gruop的id就为空了 -->
+		<id column="id" property="id" />
+		<association property="smallItems" select="findSmallItems"
+			column="id"></association>
+	</resultMap>
+
+	<select id="findSmallItems" resultType="com.cyberwise.workanalysis.bean.SkillSmallItem">
+		select * from
+		tb_cyber_skill_small_item where remove_flag = 0 and big_id = #{id}
+	</select>
+
+	<select id="findSkillById" resultMap="SkillResultMap">
+		select * from
+		tb_cyber_skill where remove_flag = 0 and id = #{id}
+	</select>
+
+	<select id="findBigItemCountById" resultType="java.lang.Integer">
+		select count(*)
+		from tb_cyber_skill_big_item where remove_flag = 0 and
+		skill_id = #{id}
+	</select>
+
+	<select id="findSmallItemCountById" resultType="java.lang.Integer">
+		select count(*)
+		from tb_cyber_skill_small_item where remove_flag = 0 and big_id =
+		#{id}
+	</select>
+
+	<update id="deleteSkill">
+		update tb_cyber_skill set remove_flag = 1 where id =
+		#{id}
+	</update>
+
+	<insert id="addSkill" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_cyber_skill
+		values(#{id},#{version},#{createTime},#{createPerson},#{useTimes},#{status},#{removeFlag},#{postId})
+	</insert>
+
+	<insert id="addBigItem" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_cyber_skill_big_item
+		values(#{id},#{name},#{type},#{removeFlag},#{skillId})
+	</insert>
+
+	<insert id="addSmallItem" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_cyber_skill_small_item
+		values(#{id},#{name},#{score},#{removeFlag},#{bigId})
+	</insert>
+	
+	<update id="updateStatus">
+		update tb_cyber_skill set `status`= #{status} where id = #{id}
+	</update>
+	
+	<update id="updateStatusAndUseTimes">
+		update tb_cyber_skill set use_times = #{useTimes},`status`= #{status} where id = #{id}
+	</update>
+	
+	<select id="findStatusByPostId" resultType="java.lang.Integer">
+		select count(*) from tb_cyber_skill where `status` = 1 and post_id = #{postId}
+	</select>
+	
+	<update id="updateSkill">
+		update tb_cyber_skill set version = #{version},create_person= #{createPerson} 
+		where id = #{id}
+	</update>
+	
+	<update id="deleteBigItem">
+		update tb_cyber_skill_big_item set remove_flag = 1 where id = #{id}
+	</update>
+	
+	<update id="updateSmallItem">
+		update tb_cyber_skill_small_item set name=#{name},score=#{score} where id = #{id}
+	</update>
+	
+	<update id="deleteSmallItem">
+		update tb_cyber_skill_small_item set remove_flag = 1 where id = #{id}
+	</update>
+	
+	<update id="updateUseTimes">
+		update tb_cyber_skill set use_times = #{useTimes} where id = #{id}
+	</update>
+</mapper>

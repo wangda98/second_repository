@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyberwise.workanalysis.mapper.UserPostMapper">
+	<select id="findPostProfessionalByType" resultType="com.cyberwise.workanalysis.bean.PostProfessional">
+		select * from tb_cyber_post_professional where type = #{type}		
+	</select>
+	
+	<insert id="addPostProfessional">
+		insert into tb_cyber_post_professional values(#{id},#{professional},#{type})
+	</insert>
+	
+	<update id="updatePostProfessional">
+		update tb_cyber_post_professional set professional = #{professional} where id = #{id}
+	</update>
+	
+	<delete id="deletePostProfessional">
+		delete from tb_cyber_post_professional where id = #{id}
+	</delete>
+	
+	<select id="findPostCountByProid" resultType="java.lang.Integer">
+		select count(*) from tb_cyber_post where professional_id = #{proid} and remove_flag = 0
+	</select>
+	
+	<select id="findPostByProfessionalId" resultType="com.cyberwise.workanalysis.bean.Post">
+		select * from tb_cyber_post where professional_id = #{proid} and remove_flag = 0
+	</select>
+	
+	<select id="findPostIdByProId" resultType="java.lang.Integer">
+		select id from tb_cyber_post where post_name='组长' and remove_flag = 0 and professional_id=#{proid}
+		<!-- 这里的post_name='组长'也可以改成post_level=2,这样不容易写死  -->
+	</select>
+	
+	<select id="findPostIdByName" resultType="java.lang.Integer">
+		select id from tb_cyber_post where post_name = #{name}
+	</select>
+	
+	<select id="findPostNameCount" resultType="java.lang.Integer">
+		select count(*) from tb_cyber_post 
+		where remove_flag = 0 and professional_id=#{proid} and post_name=#{postName}
+	</select>
+	
+	<insert id="addPost">
+		insert into tb_cyber_post 
+		values(#{id},#{postName},#{postLevel},#{postType},#{parentPostId},#{removeFlag},#{disableForStati},#{professionalId})
+	</insert>
+	
+	<update id="updatePost">
+		update tb_cyber_post set disable_for_stati = #{stati} where id = #{id}
+	</update>
+	
+	<update id="deletePost">
+		update tb_cyber_post set remove_flag = 1 where id = #{id}
+	</update>
+	
+	<select id="findUserList" resultType="com.cyberwise.workanalysis.common.User">
+		select a.id,realname from zt_user a left join tb_cyber_user_post b on a.id = b.user_id 
+		where b.user_id is null and deleted = 1 and role !=''
+	</select>
+	
+	<select id="findPostUserList" resultType="com.cyberwise.workanalysis.bean.PostUser">
+		select d.id,realname,concat(c.professional,b.post_name) as post_name,a.id uid,b.id pid,join_to_stati
+		from zt_user a,tb_cyber_post b,tb_cyber_post_professional c,tb_cyber_user_post d
+		where a.id=d.user_id and b.id=d.post_id and b.professional_id=c.id order by post_level,b.id
+	</select>
+	
+	<select id="findAllPostNameByType" resultType="com.cyberwise.workanalysis.bean.PostUser">
+		select a.id pid,concat(b.professional,a.post_name) as post_name
+		from tb_cyber_post a,tb_cyber_post_professional b
+		where a.professional_id=b.id and remove_flag=0 and post_type=#{type} order by post_level,a.id
+	</select>
+	
+	<insert id="addPostUser">
+		insert into tb_cyber_user_post values(#{id},#{pid},#{uid},#{joinToStati})
+	</insert>
+	
+	<update id="updatePostUser">
+		update tb_cyber_user_post set post_id=#{pid} and join_to_stati=#{joinToStati} where id=#{id}
+	</update>
+	
+	<update id="updatePostUserPost">
+		update tb_cyber_user_post set post_id=#{pid} where id=#{id}
+	</update>
+	
+	<update id="updatePostUserStati">
+		update tb_cyber_user_post set join_to_stati=#{joinToStati} where id=#{id}
+	</update>
+	
+	<delete id="deletePostUser">
+		delete from tb_cyber_user_post where id = #{id}
+	</delete>
+</mapper>

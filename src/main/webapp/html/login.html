@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="../css/logincss.css" rel="stylesheet" type="text/css">
+<title>登录界面</title>
+<script type="text/javascript" src="../js/base64.js"></script>
+<script type="text/javascript" src="../js/getHashFromPass.js"></script>
+<script type="text/javascript" src="../js/angular.min.js" ></script>
+<script type="text/javascript" src="../js/jquery-1.11.0.js"></script>
+<script type="text/javascript" src="../js/modal/jquery.my-modal_login.js"></script>
+<link rel="stylesheet" type="text/css" href="../css/modal/group.winStyle.css" />
+<script type="text/javascript" src="../js/CyberLoadPage.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="myController">
+	<article class="content">
+		<form>
+			<div class="content_bd">
+				<input id="acc" ng-model="account" type="text"
+					class="content_input_yhm" placeholder="请输入用户名"> <input
+					id="pwd" ng-model="password" type="password"
+					class="content_input_mm" placeholder="请输入密码">
+				<div>
+					<input id="verfcode" type="text" class="content_input_yzm"
+						placeholder="请输入验证码"><img ng-click="updata()" alt="验证码"
+						ng-src="{{img}}" width="158" height="47"
+						class="content_input_image">
+				</div>
+				<div>
+					<div class="content_wjmm">
+						<input name="" type="checkbox">&nbsp;&nbsp;&nbsp;&nbsp;忘记密码？
+					</div>
+					<input name="" type="button" class="content_button"
+						onmouseover="this.className='content_button2'"
+						onmouseout="this.className='content_button'"
+						ng-click="onCyberPageLogin()" value="登录">
+				</div>
+			</div>
+		</form>
+		 <!-- 模态框区域1 -->
+			<div class="m-modal">
+				<div class="m-modal-dialog" style="margin-top: 170px; height: 208px;">
+					<div class="m-top">
+						<h4 class="m-modal-title" id="title1">
+					消息提示
+				</h4>
+						<span class="m-modal-close" ng-click="quxiao1()" >&times;</span>
+					</div>
+					<br>
+					<div class="m-middle" style="width:auto; height:55px; overflow:auto;text-align: center;  padding-top: 13px;">
+						<span id="inputInfo"   style=" height: 50px;width: 100%;">
+						显示后台传回来的信息
+						</span>
+					</div>
+					<div class="m-bottom">
+						<!-- <button class="m-btn-cancel" ng-click="quxiao1()" >取消</button> -->
+						<button ng-click="confirm()" class="m-btn-sure">确定</button>
+					</div>
+				</div>
+			</div>
+			<!--模态框结束1-->
+	</article>
+</body>
+</html>

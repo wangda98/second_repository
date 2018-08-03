@@ -1,0 +1,177 @@
+<!DOCTYPE html yPUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<link rel="stylesheet" type="text/css" href="../css/groupAndMember.css" />
+		<link rel="stylesheet" type="text/css" href="../css/modal/group.winStyle.css" />
+		<link rel="stylesheet" type="text/css" href="../css/modal/group.winStyle2.css" />
+		 <link rel="stylesheet" href="../css/BeAlert.css">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</head>
+
+	<body ng-app="myApp" ng-controller="myController" >
+     <!--左边项目组成员区域-->
+	 <div class="box">
+	 <div class="box1">
+	 		 <div class='top'>
+			<button class="top11" onclick="add1()"><img src="../images/add.png" /><span>添加工作组 </span></button>
+			<button class="top11" onclick="delete1()"><img src="../images/delete.png" /><span>删除工作组 </span></button>
+			<button class="top11" onclick="update1()"><img src="../images/edit.png" /><span>修改工作组</span> </span></button>
+		</div>
+		<div class="content">
+			<h1></h1>
+			<div id="loading_image" style="display:none" >
+			</div>
+			<table id="dataTable" class="table1" style="margin-top:-1px;">
+				<thead >
+					<tr class="table_teb" >
+						<td><input type="radio" hidden="hidden"  /></td>
+						<td>项目组名称</td>
+						<td>项目组类型</td>
+						<td>项目状态</td>
+					</tr>
+				</thead>
+				<tbody id="tbody">
+				</tbody>
+			</table>
+		</div>
+	 </div>
+	 <!--右边项目组成员区域-->
+	 <div class="box2">
+		<div class='memberTop'>
+			<button  class="top1" onclick="addmember()"><img src="../images/add.png" /><span>添加组员至项目组 </span></button>
+			<button  class="top1" onclick="deletemember()"><img src="../images/delete.png" /><span>删除项目组的组员 </span></button>
+			<button  class="top1" onclick="updatemember()"><img src="../images/edit.png" /><span>修改组员信息</span></button>
+		</div>
+		<div class="membercontent">
+
+			<!-- 模态框区域1 -->
+			<div class="m-modal" id="modal2">
+				<div class="m-modal-dialog" style="height: 377px;">
+					<div class="m-top">
+						<h4 class="m-modal-title" id="title1">
+				</h4>
+						<span class="m-modal-close" ng-click="quxiao()">&times;</span>
+					</div>
+					<br>
+					<div id="mo1" class="m-middle" style="width:auto; height:105px; overflow:auto;">
+						<span id="inputInfo" hidden=false style="margin-top: 60px; height: 50px;width: 40px;">
+					<span> 项目名称: <input type="text" name="" id="groupName1" value="" /></span><br /> <br />
+						<span>  项目类型: <select name="" id="groupType" style="width: 173px;height: 22px;">
+						<option value="0"  >开发组</option>
+						<option value="1">UI组</option>
+						<option value="2"  >测试组</option>
+						<option value="3">运维组</option>
+					</select>
+					</span><br /><br />
+						<span hidden=true id="status"> 项目状态: <select name="" id="statusValue" style="width: 173px;height: 22px;">
+						<option value="0" >正常</option>
+						<option value="1">已下线</option>
+					</select>
+			</span> <br />
+						</span>
+			<span id="deleteInfo" hidden=true>
+				<h3>你确认删除项目组 </h3>
+				<span id="deleteGroupInfo" style="width: 200px;margin-left: 20px;"> </span>
+			</span>
+						<br />
+					</div>
+			  		<div id="mo2" class="m-middle" style="width:auto; height:188px; overflow:auto;">
+						<span id="memberinputInfo" hidden=false style="margin-top: 60px; height: 50px;width: 40px;">
+						<span>成员名称:
+							<input disabled=false type="text"  id="memberName" value="" ng-click="showName()" />
+						</span><br /> <br />
+
+						<span id="selectMemberName" hidden="hidden" style="margin-left:40px;">
+						<input id="inputName" type="text" placeholder="输入关键字搜索" style="width: 180px;height: 25px;" /><button ng-click="insert2()" style="height: 25px;width: 55px;">搜索</button><br />
+						<table class="table2" >
+				<tbody id="nameBody">
+				</tbody>
+						</table>
+						</span>
+						<span class="hidden1" id="selectGroupName"> 项目名称: <select name="" id="groupName" style="width: 173px;height: 22px;">
+					</select>
+					</span>
+					<br /><br />
+						<span class="hidden1"> 成员级别: 
+						<select name="" id="isLeader" style="width: 173px;height: 22px;">
+						<option class="isLeader" value="0" selected="selected">组员</option>
+						<option class="isLeader" value="1">组长</option>
+					</select>
+					</span> <br /><br />
+						<span hidden="hidden" id="memberStatus"> 成员状态: 
+						<select  name="" id="isRemove" style="width: 173px;height: 22px;">
+						<option class="isRemove" value="0" selected="selected">正常</option>
+						<option class="isRemove" value="1">已移除</option>
+					</select>
+					<br /><br />
+					</span>   
+					<span id="time" > <span id="memberTimeName">加入时间:</span> 
+					<input type="date" id="memberTime" style="width: 173px;height: 22px; "/>
+					</span> <br />
+						</span><br /><br />
+						<span id="deletememberInfo" hidden=true style="padding-top: 2px;">
+				<h3>确认将该成员移除项目组?</h3>
+				<span id="deletememberName" style="width: 200px;margin-left: 20px;"> </span>
+						</span>
+						<br />
+					</div> 
+					<div class="m-bottom" style="margin-top:22px">
+						<button class="m-btn-cancel" ng-click="quxiaomember()">取消</button>
+						<button id="confirmmember" hidden="hidden">确认</button><button ng-click="confirmmember()" class="m-btn-sure" id="ModelConfrim">确定</button>
+					</div>
+					<hr style="size: 1px;color: black;">
+				</div>
+			</div>
+			<!--模态框结束1-->
+			 <!-- 模态框区域2 -->
+			<div class="m-modal2">
+				<div class="m-modal-dialog2" style="margin-top: 30px; height: 208px;">
+					<div class="m-top">
+						<h4 class="m-modal-title2" id="title1">
+					消息提示
+				</h4>
+						<span class="m-modal-close2" ng-click="quxiao1()" >&times;</span>
+					</div>
+					<br>
+					<div class="m-middle2" style="width:auto; height:55px; overflow:auto;    padding-top: 13px;">
+						<span id="inputInfo2"   style=" height: 50px;width: 40px;">
+						显示后台传回来的信息
+						</span>
+					</div>
+					<div class="m-bottom2">
+						<!-- <button class="m-btn-cancel2" ng-click="quxiao1()" >取消</button> -->
+						<button ng-click="confirm()" class="m-btn-sure2">确定</button>
+					</div>
+				</div>
+			</div>
+			<!--模态框结束2-->
+			<div id="loading_image1" style="display:none">
+			</div>
+			<table class="table1" id="memberdataTable"   >
+				<thead>
+					<tr class="membertable_teb" >
+						<td><input type="radio"   hidden="hidden"  /></td>
+						<td>项目组员</td>
+						<td>项目名字</td>
+						<td>组员级别</td>
+						<td>组员状态</td>
+						<td>加入时间</td>
+						<td>离开时间</td>
+					</tr>
+				</thead>
+				<tbody id="membertbody">
+				</tbody>
+			</table>
+		</div>
+			 </div>
+		</div>
+		<script type="text/javascript" src="../js/angular.min.js"></script>
+		<script type="text/javascript" src="../js/jquery-1.11.0.js"></script>
+		<script type="text/javascript" src="../js/GroupAndUserManagePage.js"></script>
+		<script type="text/javascript" src="../js/modal/jquery.my-modal.1.1.js"></script>
+		<script type="text/javascript" src="../js/modal/jquery.my-modal.1.2.js"></script>
+   		 <script src="../js/BeAlert.js"></script>
+	</body>
+
+</html>

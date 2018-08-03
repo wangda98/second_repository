@@ -1,0 +1,430 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<script type="text/javascript" src="../js/jquery-1.11.0.js"></script>
+<script type="text/javascript" src="../js/modal/jquery.my-modal.1.1.js"></script>
+<link rel="stylesheet" type="text/css"
+	href="../css/professional_post_manage.css" />
+<link rel="stylesheet" type="text/css"
+	href="../css/modal/group.winStyle.css" />
+	<link rel="stylesheet" href="../css/BeAlert.css">
+	 <script src="../js/BeAlert.js"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<script type="text/javascript">
+	/*  全局变量  */
+	var isAddPro = "true";//点击添加是否可以添加信息
+	var proType = 0;//目前选中的类型id 
+	var cancelType;//取消类型
+	var saveType;//保存类型
+	var proName;//专业类型
+	var proId;//专业ID
+	var isJunXian//是否修改均线
+	/*  全局变量  */
+	//页面加载完自动执行
+	$(function() {
+		/*  专业改变事件 */
+		$("#professional").change(function() {
+			proId=""//清空专业id;
+			proType = $(this).val();
+			if (proType != 0) {
+				queryTable();
+			} else {
+				//清空表格
+				$("#tbody tr").each(function() {
+					$(this).remove();
+				})
+			}
+			isAddPro = "true";//重新设定可编辑
+		});
+	})
+
+	//点击添加函数
+	function add1() {
+		if(proType==0){
+			alert("请选择专业类型")
+			return;
+		}
+		if ("true" == isAddPro) {
+			cancelType = "add";//设置取消的类型
+			saveType = "add"
+			isAddPro = "false";
+			var html = "<tr><td><input type='radio' name='pro'/></td>	<td><input  placeholder='&emsp;&emsp;&emsp;请输入专业名字' id='proName'/></td><td><span style='color:blue;cursor:pointer' onclick='save(this)'>保存</span>&emsp;<span style='color:blue;cursor:pointer' onclick='cancel(this)'>取消</span></td></tr>"
+			$("#tbody").append(html)
+			$("input[name='pro']").last().parent("td").next().children("input").focus();
+		}
+	}
+	//点击删除函数
+	function delete1(self) {
+		   confirm("", "是否删除该专业", function (isConfirm) {
+               if (isConfirm) {
+            	   var tid = $(self).parent('td').prev().prev().children(
+					"input[type='radio']").attr("tid");
+			var urlString = "../service/userpost/deletePostProfessional";
+			var data = {};
+			data.id = tid;
+			caozuo(urlString, data);
+               } else {
+               }
+           }, {confirmButtonText: '确认', cancelButtonText: '取消', width: 400});
+	}
+	//点击取消函数
+	function cancel(self) {
+		queryTable()//重新查询
+		isAddPro = "true";
+	}
+	//点击保存函数
+	function save(self) {
+		var value = $(self).parent('td').prev().children("input").val()//获取input里面的值
+		var urlString;
+		var data = {};
+		data.professional = value;
+		if (saveType == "add") {
+			urlString = "../service/userpost/addPostProfessional";
+			data.type = proType;
+		} else {
+			urlString = "../service/userpost/updatePostProfessional";
+			var tid = $(self).parent('td').prev().prev().children(
+					"input[type='radio']").attr("tid");
+			data.id = tid;
+		}
+		caozuo(urlString, data);
+		isAddPro = "true";
+		$(self).parent("td").parent("tr").remove();//移除该行
+		isAddPro = "true";//重新设定可编辑
+	}
+	//点击编辑函数
+	function edit(self) {
+		//点击编辑操作栏改变状态
+		cancelType = "edit";//设置取消的类型
+		saveType = "edit";//设置保存的类型
+		 $(self).parent('td').prev().children("input[type='text']")[0].focus();
+		$(self).parent('td').prev().children("input").attr("readonly", false)//改变input里面的属性
+		var html = "<span style='color:blue;cursor:pointer' onclick='save(this)'>保存</span>&emsp;<span style='color:blue;cursor:pointer' onclick='cancel(this)'>取消</span>"
+		$(self).parent("td").html(html)
+	}
+	//点击左边的单选input显示右边对应的表格
+	function showPost(self) {
+		//赋值全局变量
+		proId = $(self).attr("tid");//获取id
+		proName = $(self).parent("td").next().children("input[type='text']")
+				.val();
+		queryPostTable()//查询postTable
+	}
+
+	//创建专业表格
+	function createTable(result) {
+		var res = result.result;
+		//清空表格
+		$("#tbody tr").each(function() {
+			$(this).remove();
+		})
+		for (a in res) {
+			var tr;
+			if (a % 2 == 0) {
+				tr = $("<tr style='background-color: #f7f7f7;'></tr>");
+			} else {
+				tr = $("<tr style='background-color: #ffffff;'></tr>");
+			}
+			var id = res[a].id;
+			var professional = res[a].professional;
+			var html = "<td><input type='radio' onclick='showPost(this)' name='pro' tId="
+					+ id
+					+ " /></td>	<td><input  readonly=true type='text' value="+professional+"></td><td><span style='color:blue;cursor:pointer' onclick='edit(this)'>编辑</span>&emsp;<span style='color:blue;cursor:pointer' onclick='delete1(this)' >删除</span></td>"
+			tr.append(html);
+			$("#tbody").append(tr)
+		}
+	}
+	//根据类型查询所有的专业
+	function queryTable() {
+		$("#loading_image").show();
+		$("#dataTable").hide();
+		$.ajax({
+			type : "POST",
+			url : "../service/userpost/findPostProfessional",
+			data : {
+				"type" : proType
+			},
+			success : function(r) {
+				if (r.code == 1) {
+					createTable(r)//刷新列表
+					$("#loading_image").hide();
+					$("#dataTable").show();
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+	//用来进行专业的增删改查的公用函数
+	function caozuo(urlString, data) {
+		$.ajax({
+			type : "POST",
+			url : urlString,
+			data : data,
+			success : function(r) {
+				if (r.code == 1) {
+					queryTable()//重新查询
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+
+	/*  --------- --------     职位的js代码       -------------- --------  */
+	//根据专业id查询右边的post表格
+	function queryPostTable() {
+		$("#loading_image1").show();
+		$("#postdataTable").hide();
+		var urlString = "../service/userpost/findPost";
+		var data = {};
+		data.proid = proId;
+		$.ajax({
+			type : "POST",
+			url : urlString,
+			data : data,
+			success : function(r) {
+				if (r.code == 1) {
+					createPostTable(r)//创建表格
+					$("#loading_image1").hide();
+					$("#postdataTable").show();
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+	//删除post
+	function deletePost(self) {
+		 confirm("", "是否确认删除该职位", function (isConfirm) {
+             if (isConfirm) {
+            	 var id = $(self).attr("pId")
+     			var urlString = "../service/userpost/deletePost";
+     			var data = {};
+     			data.id = id;
+     			caozuoPost(urlString, data)
+             } else {
+             }
+         }, {confirmButtonText: '确认', cancelButtonText: '取消', width: 400});
+	}
+	//添加职位post
+	function addPost(){
+		if(proId%1!=0||proId==""){
+			alert("请选择专业")
+			return;
+		}
+		$("#title1").html("在专业中添加职位")
+		var m21 = new MyModal.modal(function() {});
+		m21.show();		 
+	}
+	//添加的确认函数
+	function confirmPost(){
+		var postName=$("#postName").children("option:selected").text();
+		var postType=$("#postType").val();
+		var urlString = "../service/userpost/addPost";
+		var data = {};
+		data.postName = postName;
+		data.postType = proType;
+		data.professionalId = proId;
+		 caozuoPost(urlString, data);
+	}
+	//添加的确认函数
+	function editJunXian(self){
+		isJunXian=$(self).parent("td").prev().attr("is");
+		var info;
+		var stati;
+		var id = $(self).attr("pId")
+		if(isJunXian==0){
+			 info="是否将修改为 [不加入均线]"
+				 stati=1;
+		}else{
+			 info="是否将修改为 [加入均线]"
+				 stati=0;
+		}
+		 confirm("", info, function (isConfirm) {
+             if (isConfirm) {
+            	 var urlString = "../service/userpost/updatePost";
+     			var data = {};
+     			data.stati=stati;
+     			data.id=id;
+     			caozuoPost(urlString, data)
+             } else {
+             }
+         }, {confirmButtonText: '确认', cancelButtonText: '取消', width: 400});
+ 	}
+	//用来进行职位的增删改查的公用函数
+	function caozuoPost(urlString, data) {
+		$.ajax({
+			type : "POST",
+			url : urlString,
+			data : data,
+			success : function(r) {
+				if (r.code == 1) {
+					queryPostTable()//重新查询
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+	//创建专业里面的职位表格
+	function createPostTable(result) {
+		var res = result.result;
+		//清空表格
+		$("#postTbody tr").each(function() {
+			$(this).remove();
+		})
+		for (a in res) {
+			var tr;
+			if (a % 2 == 0) {
+				tr = $("<tr style='background-color: #f7f7f7;'></tr>");
+			} else {
+				tr = $("<tr style='background-color: #ffffff;'></tr>");
+			}
+			//[{"id":2,"postName":"组长","postLevel":2,"postTpye":null,"parentPostId":1,"removeFlag":0,"disableForStati":0,"professionalId":1}/*  */
+			var id = res[a].id;
+			var postName = res[a].postName;
+			var temp2 = res[a].postType;
+			var postTpye;
+			switch (temp2) {
+			case 1:
+				postTpye = "开发";
+				break;
+			case 2:
+				postTpye = "产品";
+				break;
+			case 3:
+				postTpye = "测试";
+				break;
+			case 4:
+				postTpye = "项目";
+				break;
+			default:
+				0;
+			}
+			var temp1 = res[a].disableForStati;
+			if (temp1 == 0) {
+				isJoinStati = "是"
+			} else {
+				isJoinStati = "否"
+			}
+			var html = "<td><input type='radio' onclick='selectId(this)' name='post' pId="
+					+ id
+					+ " /></td> <td>"
+					+ proName
+					+ "</td><td>"
+					+ postName
+					+ "</td><td>"
+					+ postTpye
+					+ "</td><td is="+temp1+">"
+					+ isJoinStati
+					+ "</td><td><span style='color:blue;cursor:pointer' pId="
+					+ id
+					+ " onclick='editJunXian(this)'>修改均线</span>&emsp;<span style='color:blue;cursor:pointer' pId="
+					+ id + " onclick='deletePost(this)' >删除</span></td>"
+			tr.append(html);
+			$("#postTbody").append(tr)
+		}
+	}
+</script>
+
+</head>
+<body>
+	<!--左边项目组成员区域-->
+	<div class="box">
+		<div class="firstLine">
+			<span>选择岗位种类</span> <select class="xialakuang" id="professional">
+				<option value=0>请选择类型</option>
+				<option value=1>开发</option>
+				<option value=2>产品</option>
+				<option value=3>测试</option>
+				<option value=4>项目</option>
+			</select>
+		</div>
+		<div class="box1">
+			<div class='top'>
+				<button class="top11" onclick="add1()">
+					<img src="../images/add.png" /><span>添加工作组 </span>
+				</button>
+			</div>
+			<div class="content">
+				<h1></h1>
+				<div id="loading_image" style="display: none"></div>
+				<table id="dataTable" class="table1" style="margin-top: -1px;">
+					<thead>
+						<tr class="table_teb">
+							<td><input type="radio" hidden="hidden" /></td>
+							<td>岗位名称</td>
+							<td>操作</td>
+						</tr>
+					</thead>
+					<tbody id="tbody">
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<!--右边项目组成员区域-->
+		<div class="box2">
+			<div class='memberTop'>
+				<button class="top1" onclick="addPost()">
+					<img src="../images/add.png" /><span>添加职位 </span>
+				</button>
+				<!-- <button class="top1" onclick="deletemember()">
+					<img src="../images/delete.png" /><span>删除项目组的组员 </span>
+				</button>
+				<button class="top1" onclick="updatemember()">
+					<img src="../images/edit.png" /><span>修改组员信息</span>
+				</button> -->
+			</div>
+			<div class="membercontent">
+				<!-- 模态框区域1 -->
+				<div class="m-modal" >
+					<div class="m-modal-dialog" style="height:232px;">
+						<div class="m-top">
+							<h4 class="m-modal-title" id="title1"></h4>
+							<span class="m-modal-close" onclick="quxiao()">&times;</span>
+						</div>
+						<br>
+							<div  class="m-middle"
+								style="width: auto; height: 40px;">
+								<span > 职位名称: <select
+										name="" id="postName" style="width: 173px; height: 22px;">
+											<option   value="工程师" selected="selected">工程师</option>
+											<option   value="组长">组长</option>
+									</select>
+								</span>
+								<br></br>
+							</div>
+							<div class="m-bottom" style="margin-top: 22px">
+								<button class="m-btn-cancel" >取消</button>
+								<button onclick="confirmPost()" class="m-btn-sure"
+									id="ModelConfrim">确定</button>
+							</div>
+							<hr style="size: 1px; color: black;">
+					</div>
+				</div>
+				<!--模态框结束1-->
+				<div id="loading_image1" style="display: none"></div>
+				<table class="table1" id="postdataTable">
+					<thead>
+						<tr class="posttable_teb">
+							<td><input type="radio" hidden="hidden" /></td>
+							<td>专业名称</td>
+							<td>职位名称</td>
+							<td>岗位类型</td>
+							<td>是否加入均线</td>
+							<td>操作</td>
+						</tr>
+					</thead>
+					<tbody id="postTbody">
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

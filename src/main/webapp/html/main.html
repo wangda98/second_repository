@@ -1,0 +1,95 @@
+<!doctype html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>周工作负载情况对比查询</title>
+	<link href="../css/main.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="../js/jquery-1.11.0.js"></script>
+	<script type="text/javascript" src="../js/modal/jquery.my-modal_login.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/modal/group.winStyle.css" />
+	<script type="text/javascript">
+				var hidden = true;
+		//点击缩放图标 展开/隐藏导航区
+		$(function() {
+			var change="show";
+			$("#showAndHiden").bind('click',function(){
+				if(change=="show"){
+					$(".daohang_left").animate({"width":"0%"},260)
+							$(".main_right").animate({"width":"100%"}, 260);
+							change="hiden"
+				}else{
+				$(".daohang_left").animate({"width":"21.5%"},260)
+							$(".main_right").animate({"width":"78%"}, 260);
+					change="show"
+				}
+			})
+		})
+	</script>
+</head>
+
+<body ng-app="myApp" ng-controller="myController">
+<!-- 模态框区域1 -->
+			<div class="m-modal">
+				<div class="m-modal-dialog" style="margin-top: 170px; height: 208px;">
+					<div class="m-top">
+						<h4 class="m-modal-title" id="title1">
+					消息提示
+				</h4>
+						<span class="m-modal-close" ng-click="quxiao1()" >&times;</span>
+					</div>
+					<br>
+					<div class="m-middle" style="width:auto; height:55px; overflow:auto;    padding-top: 13px;">
+						<span id="inputInfo"   style=" height: 50px;width: 40px;">
+						显示后台传回来的信息
+						</span>
+					</div>
+					<div class="m-bottom">
+						  <button class="m-btn-cancel" ng-click="quxiao1()" >取消</button>  
+						<button ng-click="confirm()" class="m-btn-sure">确定</button>
+					</div>
+				</div>
+			</div>
+			<!--模态框结束1-->
+	<!--头部-->
+	<div class="teb">
+		<h1>工作情况分析</h1>
+		<span title="点击展开/隐藏导航栏">
+		<img  id="showAndHiden" src="../images/sc_bnt.png"  />
+		</span>
+		<h2 ng-click="logout()" style="color: #fff ;cursor: pointer;">安全退出</h2>
+		<img class="teb_touxiang" src="../images/tab_tx.png" style="float: right;" />
+		<h2 id=account>用户名</h2>
+	</div>
+		<!--左侧导航开始-->
+		<div class="daohang_left" id="daoHang">
+			<div class="left_bg">
+				<div class="left_shijian">
+					<h3 class="h3" id="hour">09:30</h3>
+					<h6 class="h3" id="date">2017-10-12&nbsp;&nbsp;星期四</h6>
+				</div>
+				<div class="left_tianqi">
+					<iframe id="fancybox-frame" allowtransparency="true" frameborder="0" width="140" height="128" scrolling="no" src="//tianqi.2345.com/plugin/widget/index.htm?s=2&z=1&t=1&v=1&d=1&bd=0&k=000000&f=008040&ltf=009944&htf=cc0000&q=1&e=1&a=1&c=54511&w=140&h=128&align=left"></iframe>
+				</div>
+			</div>
+		 <!--一级菜单和二级菜单-->
+		</div>
+
+		<!--右侧内容开始-->
+		<div class="main_right">
+
+			<!--右边上标签区-->
+			<div class="main_xzk" id="labels">
+				<img onclick="refreshCyberTab()" id="img" src="../images/u32.png" style="float: left;margin-top: 13px;height: 20px " />
+			</div>
+
+			<!--右边下面页面显示内容区-->
+			<div class="biaogequ" id="tables">
+				<iframe remove="0" class="iframe" pid='0' src="welcome.html"></iframe>
+			</div>
+		</div>
+	<script type="text/javascript" src="../js/angular.min.js"></script>
+
+	<script type="text/javascript" src="../js/CyberMainPage.js"></script>
+</body>
+
+</html>

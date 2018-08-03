@@ -1,0 +1,286 @@
+@charset "UTF-8";
+/* CSS Document */
+.memberTop {
+	width: auto;
+	height: 40px;
+	align-items: center;
+	padding-left: 5%;
+	padding-top: 13px;
+	display: flex;
+	margin-bottom: 20px;
+	background-color: #fff;
+}
+
+.memberTop1 {
+	cursor: pointer;
+	font-size: 14px;
+	color: #908b8b;
+	border-radius: 6px;
+	background: #fff;
+	border: 1px solid #009ebe;
+	width: 150px; 
+	text-align: center;
+	vertical-align: middle;
+	margin-left: 10px;
+}
+
+.memberTop1:hover {
+	color: #009ebe;
+}
+
+button.memberTop1 img {
+	padding-top: 6px;
+	padding-bottom: 9px;
+	padding-right: 2px;
+	margin-left: 8px;
+	float: left;
+}
+
+button.memberTop1 span {
+	display: block;
+	line-height: 30px;
+	float: left;
+	padding-right: 20px;
+}
+
+.membercontent {
+	/* 	margin-left: 12%; */
+	height: auto;
+	width: auto;
+}
+
+.table1 td {
+	border-right: solid 1px #dddddd;
+	border-bottom: solid 1px #dddddd;
+	text-align: center;
+	font-size: 12px;
+	font-family: "微软雅黑";
+}
+
+.membertable_teb {
+	background: #e5f6f9 !important;
+}
+
+.table_tr {
+	background: #fff !important;
+}
+
+.table1 {
+	width: 100%;
+	text-align: center;
+	border: solid 1px #dddddd;
+	border-collapse: collapse;
+}
+
+.table1 thead td {
+	height: 40px;
+	font-weight: bold;
+}
+
+.table1 tr {
+	height: 46px;
+	color: #474747;
+	background: #f9f9f9;
+}
+
+.table2 td {
+	height: 25px;
+	text-align: left;
+}
+
+.table2 {
+	margin-left: 40px;
+	width: 235px;
+	height: 25px;
+	border-collapse: collapse;
+	border: 1px solid;
+	text-align: center;
+}
+
+.table2 thead td {
+	height: 25px;
+	font-weight: bold;
+	border: 1px solid;
+}
+
+#confirmmember {
+	color: #fff;
+	background-color: #04b8dc;
+	border-color: #17b6d6;
+	border-radius: 6px;
+	margin-right: 10px;
+	padding: 6px 20px;
+}
+
+body {
+	height: 600px;
+	border: 1px;
+}
+
+#loading_image1 {
+	background: url(../images/loading.gif);
+	display: block;
+	position: relative;
+	left: 50%;
+	top: 50%;
+	width: 300px;
+	height: 300px;
+	margin-left: -30%;
+	z-index: 1001;
+}
+
+.box {
+	width: 98%;
+	min-height: 858px;
+	border: solid 1px #dddddd;
+	margin: 15px 10px;
+	overflow:auto;
+}
+
+.box2 {
+	width: 53%;
+	min-height: 830px; 
+	border: solid 1px #dddddd;
+	margin-top:15px;
+	margin-right: 10px;
+	margin-left: 10px;
+	float: left;
+}
+
+.box1 {
+	width: 42%;
+    min-height: 830px;  
+	border: solid 1px #dddddd;
+	margin-top:15px;
+	margin-right: 10px;
+	margin-left: 10px;
+	float: left;
+}
+
+#groupInfoshow {
+	border: solid 1px #dddddd;
+	background: #fff;
+	width: 210px;
+	text-align: center;
+	vertical-align: middle;
+	margin-left: 29%; 
+	margin-bottom: 11px;
+	margin-top:-10px;
+}
+
+
+
+/* 原有项目组管理的样式 */
+.top {
+	width: 390px;
+	height: 40px;
+	align-items: center;
+	padding-left: 3%;
+	padding-top: 13px;
+	display: flex;
+	margin-bottom: 20px;
+	background-color: #fff;
+}
+
+.top1 {
+	cursor: pointer;
+	font-size: 13px;
+	color: #908b8b;
+	border-radius: 6px;
+	background: #fff;
+	border: 1px solid #009ebe;
+	/*width: 200px;*/
+	text-align: center;
+	vertical-align: middle;
+	margin-left: 10px;
+}
+.top11 {
+	cursor: pointer;
+	font-size: 14px;
+	color: #908b8b;
+	border-radius: 6px;
+	background: #fff;
+	border: 1px solid #009ebe;
+	width: 137px;
+    height: 34px;
+	text-align: center;
+	vertical-align: middle;
+	margin-left: 7px;
+}
+.top1:hover {
+	color: #009ebe;
+}
+
+button.top1 img {
+   margin-top: 7px;
+	float: left;
+}
+
+button.top1 span {
+	display: block;
+	line-height: 30px;
+	float: left;
+	padding-left: 7px;
+}
+button.top11 img {
+   margin-top: 7px;
+       margin-left: 5px;
+	float: left;
+}
+
+button.top11 span {
+	display: block;
+	line-height: 30px;
+	/* float: left; */
+	padding-left: 16px;
+}
+.content {
+	height: auto;
+	width: auto;
+}
+
+.content table td {
+	height: 46px;
+	font-size: 12px;
+	font-family: "微软雅黑";
+	border-right: solid 1px #dddddd;
+	border-bottom: solid 1px #dddddd;
+	text-align: center;
+}
+
+.content h2 {
+	margin-left: 27%;
+	/* text-align: center; */
+	font-family: "微软雅黑";
+	color: #474747;
+	font-weight: normal
+}
+
+.table_teb {
+	background: #e5f6f9 !important;
+}
+
+.content table tr {
+	color: #474747;
+	background: #f9f9f9;
+}
+
+
+/* body {
+	height: 600px;
+	width: 100%;
+	border: 1px;
+	margin: auto;
+} */
+
+#loading_image {
+	background: url(../images/loading.gif);
+	display: block;
+	position: relative;
+	left: 50%;
+	top: 50%;
+	width: 300px;
+	height: 300px;
+	margin-left: -34%;
+	z-index: 1001;
+}

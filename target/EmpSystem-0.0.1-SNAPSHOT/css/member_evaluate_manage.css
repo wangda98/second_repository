@@ -1,0 +1,274 @@
+@charset "UTF-8";
+
+/* CSS Document */
+
+* {
+	padding: 0;
+	margin: 0;
+	outline: none;
+	font-family: "微软雅黑";
+	font-weight: normal;
+	list-style: none;
+	text-decoration: none;
+	border: none;
+	background: none;
+}
+
+body {
+	background: #f0f3f4;
+}
+
+
+/*======头部开始=======*/
+
+h1 {
+	font-size: 28px;
+	line-height: 60px;
+	margin-left: 20px;
+	color: #fff;
+	width: 40%;
+	float: left;
+}
+
+h2 {
+	font-size: 16px;
+	line-height: 60px;
+	float: right;
+	margin-right: 10px;
+	color: #fff;
+}
+
+ul {
+	width: 100%;
+	height: 100%;
+}
+
+.main_right {
+	width: 76%;
+	height: 100%;
+	background: #f0f3f4;
+	float: left;
+	margin-left: 3px;
+}
+
+.main_xzk {
+	height: 100px;
+	background: #FFF;
+	box-shadow: 0 1px 1px #ccc;
+	padding: 5px 0px;
+	padding-left: 16%;
+}
+
+.main_grbxqs_cx {
+	height: 100px;
+	background: #FFF;
+	box-shadow: 0 1px 1px #ccc;
+	padding: 30px 30px;
+}
+
+.right_top {
+	display: block;
+	width: 100%;
+	color: #6b6b6b;
+	font-size: 22px;
+	float: left;
+}
+
+.right_top_grbxqs_cx {
+	display: block;
+	width: 100%;
+	color: #6b6b6b;
+	height: 25px;
+	font-size: 22px;
+}
+
+.xzk {
+	width: 340px;
+	/* height:35px; */
+	margin-top: 10px;
+	float: left;
+}
+.xzk1{
+	width: 340px;
+	margin-left:-79px;
+	margin-top: 10px;
+	float: left;
+}
+
+.xialakuang {
+	width: 238px;
+	height: 35px;
+	background: url(../images/xialakuang.png) no-repeat;
+	font-size: 14px;
+	color: #908b8b;
+	line-height: 35px;
+	-moz-appearance:none; /* Firefox */
+	-webkit-appearance:none; /* Safari 和 Chrome*/
+}
+.xialakuang2 {
+	width: 126px;
+	height: 35px;
+	background: url(../images/xialakuang2.png) no-repeat  ;
+	font-size: 14px;
+	color: #908b8b;
+	line-height: 35px;
+	float:left;
+	margin-top:-2px;
+	margin-left:30px;
+	padding-left:18px;
+	-moz-appearance:none; /* Firefox */
+	-webkit-appearance:none; /* Safari 和 Chrome*/
+}
+
+.content_button {
+	height: 35px;
+	text-align: center;
+	font-size: 14px;
+	border-radius: 5px;
+	background-color: #04b8dc;
+	width: 124px;
+	color: #ffffff;
+	cursor: pointer;
+	margin-left: -80px;
+}
+
+.content_button2 {
+	height: 35px;
+	text-align: center;
+	font-size: 14px;
+	border-radius: 5px;
+	background-color: #0098b6;
+	width: 124px;
+	color: #ffffff;
+	cursor: pointer;
+	margin-left: -80px;
+}
+.content_button1 {
+	height: 35px;
+	text-align: center;
+	font-size: 14px;
+	border-radius: 5px;
+	background-color: #04b8dc;
+	width: 124px;
+	color: #ffffff;
+	cursor: pointer;
+  margin-left: 30px;  
+	margin-top: -2px;
+}
+
+.content_button12 {
+	height: 35px;
+	text-align: center;
+	font-size: 14px;
+	border-radius: 5px;
+	background-color: #0098b6;
+	width: 124px;
+	color: #ffffff;
+	cursor: pointer;
+	margin-left: 30px;  
+	margin-top: -2px;
+}
+
+/*=======右边下面表格内容区=========*/
+
+.biaogequ {
+	width: 99.8%;
+	height: 100%;
+	border: solid 1px #dddddd;
+	margin: 5px 0 0px;
+	background: #fff;
+	float: left;
+}
+
+.box {
+	width: 98%;
+	height: 100%;
+	border: solid 1px #dddddd;
+	margin: 15px 1%;
+}
+
+.table {
+	cellspacing: "0";
+	cellpadding: "0";
+	table-layout: fixed; 
+}
+
+.table th  {
+	text-align:center;
+	font-size:12px;
+	/* padding:0 2px; */
+	border-right:solid 1px #dddddd;
+	border-bottom:solid 1px #dddddd;
+}
+
+.table tr {
+	height: 40px;
+	line-height: 40px;
+	color: #474747;
+	background: #f9f9f9;
+}
+ .table td{
+	text-align:center;
+	font-size:12px;
+	height:40px;
+	line-height:20px;
+	/* padding:0 2px; */
+	border-right:solid 1px #dddddd;
+	border-bottom:solid 1px #dddddd;
+}
+/*增加删除停用按钮样式*/
+.top {
+	width: auto;
+	height: 40px;
+	align-items: center;
+    margin-left: -1%;
+	padding-top: 12px;
+    width: 280px;
+	display: flex;
+	margin-bottom: 12px;
+	background-color: #fff;
+}
+
+.top1 {
+	cursor: pointer;
+	font-size: 14px;
+	color: #908b8b;
+	border-radius: 6px;
+	background: #fff;
+	border: 1px solid #009ebe;
+	width: 70px;
+	text-align: center;
+	vertical-align: middle;
+	margin-left: 10px;
+	margin-top:8px;
+}
+
+.top1:hover {
+	color: #009ebe;
+}
+
+button.top1 span {
+	display: block;
+	line-height: 30px;
+}
+.titleArea{
+	height: 6px;
+	padding-left: 7%;
+	padding-top: 12px;
+	font-size: 16px;
+}
+.caozuo{
+	color: blue;
+	cursor: pointer;
+}
+#loading_image{
+				background: url(../images/loading.gif);
+				display: block;
+                position: relative;
+                left: 50%;
+                top: 50%;
+                width: 300px;
+                height: 300px;
+                margin-left: -16%;
+                z-index: 1001;
+			}

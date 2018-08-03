@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyberwise.workanalysis.mapper.WorkInfoForWeekMapper">
+  <resultMap id="BaseResultMap" type="com.cyberwise.workanalysis.bean.WorkInfoForWeek">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="realname" jdbcType="VARCHAR" property="realname" />
+    <result column="account" jdbcType="VARCHAR" property="account" />
+    <result column="week_capacity" jdbcType="DOUBLE" property="weekCapacity" />
+    <result column="consumed_week_capacity" jdbcType="DOUBLE" property="consumedWeekCapacity" />
+    <result column="cpl" jdbcType="DOUBLE" property="cpl" />
+    <result column="ptt" jdbcType="DOUBLE" property="ptt" />
+    <result column="week_start_date" jdbcType="DATE" property="weekStartDate" />
+  </resultMap>
+  
+  <select id="findIndex" resultType="java.util.Map" statementType="CALLABLE">
+      
+      {CALL get_member_work_in_task_ch(#{beginDate,jdbcType=DATE},#{endDate,jdbcType=DATE})}
+      
+  </select>
+  
+  <select id="findObject" resultType="java.util.List">
+    select distinct aaa.project_name from (
+	select aa.account,project_name,aa.task as task_id,task_name,sum(aa.consumed) as consumed_week ,bb.task_estimate,bb.task_status,bb.estStarted, bb.deadline, bb.realStarted from zt_taskestimate aa 
+	inner JOIN(
+		select a.`id` as task_id, a.`name` as task_name,a.estimate as task_estimate,a.`status` as task_status,b.`name` as project_name, 
+		a.estStarted, a.deadline, a.realStarted
+		from zt_task a 
+		inner join zt_project b
+		on a.project = b.`id`
+		where b.deleted = '0' and a.deleted = '0'
+	) bb
+	on aa.task = bb.task_id
+	group by aa.account,aa.task,task_name,bb.estStarted, bb.deadline, bb.realStarted
+	order by aa.account,project_name,aa.task,task_estimate,bb.task_status,aa.`date` desc 
+	)aaa;
+  </select>
+  
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, realname, account, week_capacity, consumed_week_capacity, cpl, ptt, week_start_date
+  </sql>
+  <select id="selectByExample" parameterType="com.cyberwise.workanalysis.bean.WorkInfoForWeekExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from cb_st_work_info_for_week
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from cb_st_work_info_for_week
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from cb_st_work_info_for_week
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cyberwise.workanalysis.bean.WorkInfoForWeekExample">
+    delete from cb_st_work_info_for_week
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cyberwise.workanalysis.bean.WorkInfoForWeek">
+    insert into cb_st_work_info_for_week (id, realname, account, 
+      week_capacity, consumed_week_capacity, cpl, 
+      ptt, week_start_date)
+    values (#{id,jdbcType=INTEGER}, #{realname,jdbcType=VARCHAR}, #{account,jdbcType=VARCHAR}, 
+      #{weekCapacity,jdbcType=DOUBLE}, #{consumedWeekCapacity,jdbcType=DOUBLE}, #{cpl,jdbcType=DOUBLE}, 
+      #{ptt,jdbcType=DOUBLE}, #{weekStartDate,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cyberwise.workanalysis.bean.WorkInfoForWeek">
+    insert into cb_st_work_info_for_week
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="realname != null">
+        realname,
+      </if>
+      <if test="account != null">
+        account,
+      </if>
+      <if test="weekCapacity != null">
+        week_capacity,
+      </if>
+      <if test="consumedWeekCapacity != null">
+        consumed_week_capacity,
+      </if>
+      <if test="cpl != null">
+        cpl,
+      </if>
+      <if test="ptt != null">
+        ptt,
+      </if>
+      <if test="weekStartDate != null">
+        week_start_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="realname != null">
+        #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="account != null">
+        #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="weekCapacity != null">
+        #{weekCapacity,jdbcType=DOUBLE},
+      </if>
+      <if test="consumedWeekCapacity != null">
+        #{consumedWeekCapacity,jdbcType=DOUBLE},
+      </if>
+      <if test="cpl != null">
+        #{cpl,jdbcType=DOUBLE},
+      </if>
+      <if test="ptt != null">
+        #{ptt,jdbcType=DOUBLE},
+      </if>
+      <if test="weekStartDate != null">
+        #{weekStartDate,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cyberwise.workanalysis.bean.WorkInfoForWeekExample" resultType="java.lang.Long">
+    select count(*) from cb_st_work_info_for_week
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update cb_st_work_info_for_week
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.realname != null">
+        realname = #{record.realname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.account != null">
+        account = #{record.account,jdbcType=VARCHAR},
+      </if>
+      <if test="record.weekCapacity != null">
+        week_capacity = #{record.weekCapacity,jdbcType=DOUBLE},
+      </if>
+      <if test="record.consumedWeekCapacity != null">
+        consumed_week_capacity = #{record.consumedWeekCapacity,jdbcType=DOUBLE},
+      </if>
+      <if test="record.cpl != null">
+        cpl = #{record.cpl,jdbcType=DOUBLE},
+      </if>
+      <if test="record.ptt != null">
+        ptt = #{record.ptt,jdbcType=DOUBLE},
+      </if>
+      <if test="record.weekStartDate != null">
+        week_start_date = #{record.weekStartDate,jdbcType=DATE},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update cb_st_work_info_for_week
+    set id = #{record.id,jdbcType=INTEGER},
+      realname = #{record.realname,jdbcType=VARCHAR},
+      account = #{record.account,jdbcType=VARCHAR},
+      week_capacity = #{record.weekCapacity,jdbcType=DOUBLE},
+      consumed_week_capacity = #{record.consumedWeekCapacity,jdbcType=DOUBLE},
+      cpl = #{record.cpl,jdbcType=DOUBLE},
+      ptt = #{record.ptt,jdbcType=DOUBLE},
+      week_start_date = #{record.weekStartDate,jdbcType=DATE}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cyberwise.workanalysis.bean.WorkInfoForWeek">
+    update cb_st_work_info_for_week
+    <set>
+      <if test="realname != null">
+        realname = #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="account != null">
+        account = #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="weekCapacity != null">
+        week_capacity = #{weekCapacity,jdbcType=DOUBLE},
+      </if>
+      <if test="consumedWeekCapacity != null">
+        consumed_week_capacity = #{consumedWeekCapacity,jdbcType=DOUBLE},
+      </if>
+      <if test="cpl != null">
+        cpl = #{cpl,jdbcType=DOUBLE},
+      </if>
+      <if test="ptt != null">
+        ptt = #{ptt,jdbcType=DOUBLE},
+      </if>
+      <if test="weekStartDate != null">
+        week_start_date = #{weekStartDate,jdbcType=DATE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cyberwise.workanalysis.bean.WorkInfoForWeek">
+    update cb_st_work_info_for_week
+    set realname = #{realname,jdbcType=VARCHAR},
+      account = #{account,jdbcType=VARCHAR},
+      week_capacity = #{weekCapacity,jdbcType=DOUBLE},
+      consumed_week_capacity = #{consumedWeekCapacity,jdbcType=DOUBLE},
+      cpl = #{cpl,jdbcType=DOUBLE},
+      ptt = #{ptt,jdbcType=DOUBLE},
+      week_start_date = #{weekStartDate,jdbcType=DATE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyberwise.workanalysis.mapper.WorkCapacity2Mapper">
+	<resultMap id="BaseResultMap" type="com.cyberwise.workanalysis.bean.WorkCapacity2">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="start_date" jdbcType="DATE" property="startDate" />
+		<result column="end_date" jdbcType="DATE" property="endDate" />
+		<result column="realname" jdbcType="VARCHAR" property="realname" />
+		<result column="task_processor" jdbcType="VARCHAR" property="taskProcessor" />
+		<result column="capacity" jdbcType="DOUBLE" property="capacity" />
+		<result column="stati_time" jdbcType="TIMESTAMP" property="statiTime" />
+		<result column="project" jdbcType="INTEGER" property="project" />
+		<result column="project_name" jdbcType="VARCHAR" property="projectName" />
+	</resultMap>
+	<sql id="Example_Where_Clause">
+		<where>
+			<foreach collection="oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" prefixOverrides="and" suffix=")">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach close=")" collection="criterion.value" item="listItem"
+										open="(" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria"
+				separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" prefixOverrides="and" suffix=")">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach close=")" collection="criterion.value" item="listItem"
+										open="(" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		id, start_date, end_date, realname, task_processor,
+		capacity, stati_time,
+		project,
+		project_name
+	</sql>
+	<select id="selectByExample"
+		parameterType="com.cyberwise.workanalysis.bean.WorkCapacity2Example"
+		resultMap="BaseResultMap">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from cb_st_work_capacity2
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from cb_st_work_capacity2
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		cb_st_work_capacity2
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<delete id="deleteByExample"
+		parameterType="com.cyberwise.workanalysis.bean.WorkCapacity2Example">
+		delete from cb_st_work_capacity2
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<insert id="insert" parameterType="com.cyberwise.workanalysis.bean.WorkCapacity2">
+		insert into
+		cb_st_work_capacity2 (id, start_date, end_date,
+		realname,
+		task_processor, capacity,
+		stati_time, project, project_name
+		)
+		values
+		(#{id,jdbcType=INTEGER}, #{startDate,jdbcType=DATE},
+		#{endDate,jdbcType=DATE},
+		#{realname,jdbcType=VARCHAR},
+		#{taskProcessor,jdbcType=VARCHAR}, #{capacity,jdbcType=DOUBLE},
+		#{statiTime,jdbcType=TIMESTAMP}, #{project,jdbcType=INTEGER},
+		#{projectName,jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.cyberwise.workanalysis.bean.WorkCapacity2">
+		insert into cb_st_work_capacity2
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="startDate != null">
+				start_date,
+			</if>
+			<if test="endDate != null">
+				end_date,
+			</if>
+			<if test="realname != null">
+				realname,
+			</if>
+			<if test="taskProcessor != null">
+				task_processor,
+			</if>
+			<if test="capacity != null">
+				capacity,
+			</if>
+			<if test="statiTime != null">
+				stati_time,
+			</if>
+			<if test="project != null">
+				project,
+			</if>
+			<if test="projectName != null">
+				project_name,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="startDate != null">
+				#{startDate,jdbcType=DATE},
+			</if>
+			<if test="endDate != null">
+				#{endDate,jdbcType=DATE},
+			</if>
+			<if test="realname != null">
+				#{realname,jdbcType=VARCHAR},
+			</if>
+			<if test="taskProcessor != null">
+				#{taskProcessor,jdbcType=VARCHAR},
+			</if>
+			<if test="capacity != null">
+				#{capacity,jdbcType=DOUBLE},
+			</if>
+			<if test="statiTime != null">
+				#{statiTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="project != null">
+				#{project,jdbcType=INTEGER},
+			</if>
+			<if test="projectName != null">
+				#{projectName,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<select id="countByExample"
+		parameterType="com.cyberwise.workanalysis.bean.WorkCapacity2Example"
+		resultType="java.lang.Long">
+		select count(*) from cb_st_work_capacity2
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+	<update id="updateByExampleSelective" parameterType="map">
+		update cb_st_work_capacity2
+		<set>
+			<if test="record.id != null">
+				id = #{record.id,jdbcType=INTEGER},
+			</if>
+			<if test="record.startDate != null">
+				start_date = #{record.startDate,jdbcType=DATE},
+			</if>
+			<if test="record.endDate != null">
+				end_date = #{record.endDate,jdbcType=DATE},
+			</if>
+			<if test="record.realname != null">
+				realname = #{record.realname,jdbcType=VARCHAR},
+			</if>
+			<if test="record.taskProcessor != null">
+				task_processor =
+				#{record.taskProcessor,jdbcType=VARCHAR},
+			</if>
+			<if test="record.capacity != null">
+				capacity = #{record.capacity,jdbcType=DOUBLE},
+			</if>
+			<if test="record.statiTime != null">
+				stati_time = #{record.statiTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="record.project != null">
+				project = #{record.project,jdbcType=INTEGER},
+			</if>
+			<if test="record.projectName != null">
+				project_name = #{record.projectName,jdbcType=VARCHAR},
+			</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExample" parameterType="map">
+		update cb_st_work_capacity2
+		set id = #{record.id,jdbcType=INTEGER},
+		start_date = #{record.startDate,jdbcType=DATE},
+		end_date =
+		#{record.endDate,jdbcType=DATE},
+		realname =
+		#{record.realname,jdbcType=VARCHAR},
+		task_processor =
+		#{record.taskProcessor,jdbcType=VARCHAR},
+		capacity =
+		#{record.capacity,jdbcType=DOUBLE},
+		stati_time =
+		#{record.statiTime,jdbcType=TIMESTAMP},
+		project =
+		#{record.project,jdbcType=INTEGER},
+		project_name =
+		#{record.projectName,jdbcType=VARCHAR}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="com.cyberwise.workanalysis.bean.WorkCapacity2">
+		update cb_st_work_capacity2
+		<set>
+			<if test="startDate != null">
+				start_date = #{startDate,jdbcType=DATE},
+			</if>
+			<if test="endDate != null">
+				end_date = #{endDate,jdbcType=DATE},
+			</if>
+			<if test="realname != null">
+				realname = #{realname,jdbcType=VARCHAR},
+			</if>
+			<if test="taskProcessor != null">
+				task_processor = #{taskProcessor,jdbcType=VARCHAR},
+			</if>
+			<if test="capacity != null">
+				capacity = #{capacity,jdbcType=DOUBLE},
+			</if>
+			<if test="statiTime != null">
+				stati_time = #{statiTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="project != null">
+				project = #{project,jdbcType=INTEGER},
+			</if>
+			<if test="projectName != null">
+				project_name = #{projectName,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.cyberwise.workanalysis.bean.WorkCapacity2">
+		update
+		cb_st_work_capacity2
+		set start_date = #{startDate,jdbcType=DATE},
+		end_date = #{endDate,jdbcType=DATE},
+		realname =
+		#{realname,jdbcType=VARCHAR},
+		task_processor =
+		#{taskProcessor,jdbcType=VARCHAR},
+		capacity =
+		#{capacity,jdbcType=DOUBLE},
+		stati_time =
+		#{statiTime,jdbcType=TIMESTAMP},
+		project = #{project,jdbcType=INTEGER},
+		project_name = #{projectName,jdbcType=VARCHAR}
+		where id =
+		#{id,jdbcType=INTEGER}
+	</update>
+
+	<!-- 自定义查询区 -->
+	<select id="findAllProject" parameterType="java.lang.String"
+		resultType="com.cyberwise.workanalysis.bean.WorkCapacity2">
+		select distinct project,project_name from cb_st_work_capacity2 where start_date = #{date}
+	</select>
+
+	<select id="findWeekCapacity" parameterType="java.lang.String"
+		resultType="java.util.Map">
+		${_parameter}
+	</select>
+
+	<select id="findWeekData" 
+		resultType="com.cyberwise.workanalysis.bean.WorkCapacity2">
+		select distinct start_date,end_date from cb_st_work_capacity2 order by start_date,end_date desc
+	</select>
+
+	<select id="findPersonalWorkAnalysis" 
+		resultType="com.cyberwise.workanalysis.common.PersonalWorkAnalysis">
+		select b.realname,a.start_date,DATE_ADD(a.start_date,INTERVAL 6 day) as end_date,b.week_capacity,b.consumed_week_capacity,b.cpl,b.ptt from 
+		(
+			select distinct week_start_date as start_date,date_add(week_start_date,INTERVAL 6 day) from cb_st_work_info_for_week 
+			where week_start_date&gt;=#{startDate} and date_add(week_start_date,INTERVAL 5 day)&lt;#{endDate}
+		)a
+		left outer join
+		(
+			select realname,week_start_date as start_date,sum(week_capacity) as week_capacity,sum(consumed_week_capacity) as consumed_week_capacity,sum(cpl) as cpl,sum(ptt) as ptt  
+			from cb_st_work_info_for_week 
+			where realname in(${names}) and week_start_date&gt;=#{startDate} and date_add(week_start_date,INTERVAL 5 day)&lt;#{endDate}
+			group by realname,week_start_date
+		)b 
+		on a.start_date = b.start_date 
+		order by b.realname,a.start_date
+	</select>
+
+	<select id="findWeekOfPersonalWorkAnalysis" 
+		resultType="com.cyberwise.workanalysis.common.PersonalWorkAnalysis">
+			select distinct week_start_date as start_date from cb_st_work_info_for_week 
+			where week_start_date &gt;=#{startDate} and date_add(week_start_date,INTERVAL 5 day) &lt;#{endDate} order by start_date
+	</select>
+
+	<select id="findAverageline" 
+		resultType="com.cyberwise.workanalysis.common.PersonalWorkAnalysis">
+		select start_date,end_date,
+		case when cnt=0 then null else week_capacity/cnt end as week_capacity,
+		case when cnt=0 then null else consumed_week_capacity/cnt end as consumed_week_capacity,
+		case when cnt=0 then null else cpl/cnt end as cpl,
+		case when cnt=0 then null else ptt/cnt end as ptt
+		from 
+		(
+			select aa.start_date,count(*) cnt,DATE_ADD(aa.start_date,INTERVAL 6 day) as end_date,
+			sum(bb.week_capacity) as week_capacity,sum(bb.consumed_week_capacity) as consumed_week_capacity, sum(bb.cpl) as cpl, sum(bb.ptt) as ptt from 
+			(
+				select distinct week_start_date as start_date,date_add(week_start_date,INTERVAL 6 day) from cb_st_work_info_for_week 
+				where week_start_date &gt;=#{startDate} and date_add(week_start_date,INTERVAL 5 day) &lt;#{endDate}
+			)aa
+			left outer join
+			(
+				select realname,week_start_date as start_date,sum(week_capacity) as week_capacity,sum(consumed_week_capacity) as consumed_week_capacity,sum(cpl) as cpl,sum(ptt) as ptt  
+				from cb_st_work_info_for_week 
+				where realname in
+				(
+					select c.realname from tb_cyber_post a 
+					inner join tb_cyber_user_post b
+					on a.`id` = b.post_id
+					inner join zt_user c
+					on b.user_id = c.`id`
+					where b.join_to_stati = 1 
+					<if test="positionId != 0">
+						and b.post_id = #{positionId}  <!-- 传入参数，岗位编号 -->
+					</if>
+				) and week_start_date &gt;=#{startDate} and date_add(week_start_date,INTERVAL 5 day) &lt;#{endDate}
+				group by realname,week_start_date
+			)bb
+			on aa.start_date = bb.start_date 
+			group by aa.start_date
+		)aaa
+		order by start_date
+	</select>
+
+	<select id="findOperatingPost" 
+		resultType="com.cyberwise.workanalysis.common.PostInfo">
+		select a.`id` as post_id, concat(ifnull(concat(professional,'-'),'所有'),post_name) as post_name,a.post_type,a.post_level,a.parent_post_id
+		from tb_cyber_post a 
+		left outer join tb_cyber_post_professional b
+		on a.professional_id = b.`id`
+		where a.remove_flag = 0 and a.disable_for_stati = 0
+		order by post_level,a.`id`
+	</select>
+
+	<select id="findUserPostInfo" 
+		resultType="com.cyberwise.workanalysis.common.UserPostInfo">
+		select a.user_id, b.realname,concat(d.professional,c.post_name) as post_name,
+		case when d.type=1 then '开发' when d.type=2 then '产品' when d.type=3 then '测试' when d.type=4 then '项目' else d.type end as post_type
+		from tb_cyber_user_post a
+		left outer join zt_user b
+		on a.user_id = b.`id`
+		left outer join tb_cyber_post c
+		on a.post_id = c.`id`
+		left outer join tb_cyber_post_professional d
+		on c.professional_id = d.`id`
+		where c.remove_flag = 0 and c.disable_for_stati = 0 and a.join_to_stati = 1
+		order by c.post_level,c.`id`
+	</select>
+
+	<select id="findPersonalWorkCapacityInProject"
+		resultType="com.cyberwise.workanalysis.common.PersonalPerformInProject">
+		select a.*,c.`name` as project_name, b.realname,b.per_project_capacity,WEEKOFYEAR(date_add(a.stati_time, INTERVAL -7 day)) as week_no FROM
+		(
+			select distinct project, stati_time from cb_st_project_per_capacity
+			where date_add(stati_time, INTERVAL -7 day)&gt;=#{startDate} and date_add(stati_time, INTERVAL -2 day)&lt;#{endDate}
+		)a
+		left outer JOIN
+		(
+			select * from cb_st_project_per_capacity 
+			where realname in(${names}) and date_add(stati_time, INTERVAL -7 day)&gt;=#{startDate} and date_add(stati_time, INTERVAL -2 day)&lt;#{endDate}
+		)b
+		on a.project = b.project and a.stati_time = b.stati_time 
+		left outer join zt_project c
+		on a.project = c.`id`
+		order by a.project,b.realname,a.stati_time
+	</select>
+	
+	<select id="findWeekOfPersonalWorkCapacityInProject" 
+		resultType="com.cyberwise.workanalysis.common.PersonalPerformInProject">
+		select distinct stati_time,WEEKOFYEAR(date_add(stati_time, INTERVAL -7 day)) as week_no from cb_st_project_per_capacity 
+		where date_add(stati_time, INTERVAL -7 day)&gt;=#{startDate} and date_add(stati_time, INTERVAL -2 day)&lt;#{endDate} order by stati_time
+	</select>
+	
+	<select id="findGroups" resultMap="GroupResultMap">
+		select * from tb_cyber_group where removed_flag = 0
+	</select>
+	
+	<select id="findUsers" parameterType="java.lang.Integer"
+		resultType="com.cyberwise.workanalysis.common.User">
+		select u.id,u.realname,gu.is_leader from zt_user u,tb_cyber_group_user gu where u.id = gu.user_id and gu.removed_flag = 0 and gu.group_id = #{id}
+	</select>
+	
+	<resultMap type="com.cyberwise.workanalysis.common.GroupUser" id="GroupResultMap">
+		<!-- 不指定id则id传过去gruop的id就为空了 -->
+		<id column="id" property="id"/>
+		<association property="users" select="findUsers" column="id"></association>
+	</resultMap>
+</mapper>

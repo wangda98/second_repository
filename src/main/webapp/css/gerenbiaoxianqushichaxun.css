@@ -1,0 +1,62 @@
+@charset "UTF-8";
+/* CSS Document */
+
+
+.zgzdbcx{
+	background:url(../images/zgzdbcx_s.png) no-repeat 22px ;
+	}
+.zgzdbcx:hover{
+	color:#009ebe;
+	background:url(../images/zgzdbcx_h.png) no-repeat 22px ;
+	border-left:4px solid #21aecb;
+	}
+	
+.grgzbxqscx_h{
+	color:#009ebe;
+	background:url(../images/grgzbxqscx_h.png) no-repeat 22px;
+	border-left:4px solid #21aecb;
+	}
+.input_box{
+	width:145px;
+	height:22px;
+	text-align:center;
+	font-size:14px;
+	color:#908b8b;
+	border:1px solid #009ebe;
+	border-radius:5px;
+	}
+.w{
+	width:25%;
+	}
+.w_32{
+	width:32%;
+	}
+.w_60{
+	width:60%;
+	}
+.w_21{
+	width:21%;
+}
+.xlk_bg{
+	width:132px;
+	height:35px;
+	background:url(../images/xlk_1.png) no-repeat;
+	font-size:14px;
+	color:#908b8b;
+	line-height:35px;
+	}
+.dianjiziti{
+	color:#009ebe;
+	margin-right:30px;
+	cursor:pointer;
+	float:left;
+	}
+.float_right{
+	float:right;
+	}
+.h{
+	height:140px;
+	}
+.border{
+	border:none;
+	}

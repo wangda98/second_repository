@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>团队周工作负载情况对比分析</title>
+<!-- hchart -->
+<script type="text/javascript" src="../js/hchart/jquery-1.8.3.min.js"></script>
+<link href="../css/personal_skill_evaluate.css" type="text/css"
+	rel="stylesheet" />
+<link rel="stylesheet" href="../css/BeAlert.css">
+	 <script src="../js/BeAlert.js"></script>
+<script type="text/javascript">
+	var bigItemsList = {};
+	var dateText; //获取选择框里的文本
+	var dateId;
+	var dateSend = 0; //发送所选择的专业数据的值
+	var dateSend2 = 1; //发送版本状态数据的值
+	var tableData; //接收到的表格数据
+	var url; 
+	$(function() {
+		//查询专业项目并且填充到下拉框;
+		onCyberPageLoad();
+		//select选中事件选中专业信息
+		$("#ProfessionalSelect").change(function() {
+			dateText = $("#ProfessionalSelect option:selected").text();
+			dateSend = $(this).val();
+			/* $(".titleArea p").html(dateText) */
+		});
+		$("#selectStatus").change(function() {
+			dateSend2 = $(this).val();
+		});
+	});
+	//获取radio选择框选中的id
+	var getZId = function() {
+		var input = $(".zixiang:radio:checked");
+		return input.attr("zId")
+	}
+	//删除评分版本
+	var delete1 = function() {
+		var zId = getZId();
+		if(zId==""||zId==null){
+			alert("请选择评分版本");
+			return;
+		}
+		   confirm("", "是否确认删除该版本", function (isConfirm) {
+               if (isConfirm) {
+            	   var data={};
+          		 data.id=zId;
+          		var url="../service/skill/deleteSkill"
+          		zhiXing(url,data);
+               } else {
+               }
+           }, {confirmButtonText: '确认', cancelButtonText: '取消', width: 400});
+	}
+	//复制评分版本
+	var copy1 = function() {
+		var zId = getZId();
+		if(zId==""||zId==null){
+			alert("请选择评分版本");
+			return;
+		}
+		var data={};
+		 data.id=zId;
+			var url="../service/skill/copySkill"
+				zhiXing(url,data);
+	}
+	//停用评分版本
+	var stop =function(self){
+		var is=confirm("是否确认停用该版本");
+		if(is){
+			var zId = $(self).attr("zId");
+			 var data={};
+			 data.id=zId;
+			var url="../service/skill/stopSkill"
+				 zhiXing(url,data);
+		}
+	}
+	
+	//启用评分版本
+	var reStart =function(self){
+		var is=confirm("是否确认启用该版本");
+		 var f=$(self).parent("td")
+		if(is){
+			var zId = $(self).attr("zId");
+			var postId = $(self).attr("postId");
+			var useTimes = $(self).attr("userTimes");
+				 var data={};
+				 data.id=zId;
+				 data.postId=postId;
+				 data.useTimes=useTimes;
+				var url ="../service/skill/startSkill";
+				 zhiXing(url,data);
+		}
+	}
+	//编辑评分版本
+	var edit = function(self) {
+		 var f=$(self).parent("td")
+		 var zId=f.children("span:first").attr("zId") ;
+		 var postId=f.children("span:first").attr("postId") ;
+		 window.location.href="person_skill_manage.html?type=2&id="+zId+"&postId="+postId;
+	}
+	//新增评分版本
+	var add1 = function(self) {
+		 if(dateSend==0){
+			 alert("请在下拉框中选择对应的专业")
+			 return;
+		 }
+		 window.location.href="person_skill_manage.html?type=1&postId="+dateSend;
+	}
+	//查看评分版本详情
+	var detail = function(self) {
+		 var zId=$(self).attr("zId") ;
+		 var postId=$(self).attr("postId") ;
+		 window.location.href="person_skill_manage.html?type=3&id="+zId+"&postId="+postId;
+	}
+	//用来执行增删改查
+	function zhiXing(urlString,data){
+		$.ajax({
+			type : "POST",
+			url : urlString,
+			data : data,
+			success : function(r) {
+				if (r.code == 1) {
+					onGetProfessional()//刷新列表
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+	//打开页面加载专业选项信息(默认为全部)
+	function onCyberPageLoad() {
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/getAllPostProfessional",
+			data : {},
+			success : function(r) {
+				if (r.code == 1) {
+					pro = r.result;
+					//alert(weekDate);
+					for ( var i in pro) {
+						var id = pro[i].id;
+						var type = pro[i].type;
+						var professional = pro[i].professional;
+						if (type == 1) {
+							$("#ProfessionalSelect").append(
+									'<option value=' + id + '>' + professional
+											+ '</option>');
+						}
+					}
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+
+	//点击查询按钮获取选中的专业信息
+	function onGetProfessional() {
+		$("#loading_image").show();
+		$("#tableDiv").hide();
+		ajaxGetData();
+	}
+	//根据状态店家查询
+	function onGetProfessional2() {
+		$("#loading_image").show();
+		$("#tableDiv").hide();
+			$.ajax({
+				type : "POST",
+				url : "../service/skill/findSkillByStatus",
+				data : {
+					'status' : dateSend2
+				},
+				success : function(r) {
+					if (r.code == 1) {
+						tableData = r.result;
+						createTable(tableData);
+						$("#loading_image").hide();
+						$("#tableDiv").show();
+					} else {
+						alert(r.msg);
+					}
+				}
+			});
+	}
+
+	//发送创建表格请求
+	function ajaxGetData() {
+		$.ajax({
+			type : "POST",
+			url : "../service/skill/getSkillList",
+			data : {
+				'postId' : dateSend
+			},
+			success : function(r) {
+				if (r.code == 1) {
+					tableData = r.result;
+					createTable(tableData);
+					$("#loading_image").hide();
+					$("#tableDiv").show();
+				} else {
+					alert(r.msg);
+				}
+			}
+		});
+	}
+
+	//创建表单
+	function createTable(data) {
+		var table = $("#dataTable");
+		//清空表格
+		$("#dataTable tr:not(.biaotou)").empty();
+		$("#dataTable tr:not(.biaotou)").each(function() {
+			$(this).remove();
+		})
+		for ( var i in data) {
+			var id = data[i].id;
+			var version = data[i].version;
+			var createTime = data[i].createTime;
+			var createPerson = data[i].createPerson;
+			var useTimes = data[i].useTimes;
+			var status = data[i].status;
+			var caozuo = ""; //操作
+			var removeFlag = data[i].removeFlag;
+			var postId = data[i].postId;
+			var bigItems = data[i].bigItems; // 取出大项的集合
+			var bigItemNum = data[i].bigItemNum;
+			var	postName=data[i].postName;
+			bigItemsList.postId = bigItems; //将大项的集合放入到大项对象里
+			var totalItemNum =data[i].smallItemNum;
+			var totalScore = data[i].totalScore;
+			if (status == 1) {
+				status = "正常"
+				caozuo = "<span class='caozuo' zId="+id+" onclick='stop(this)' >停用&emsp;</span><span class='caozuo' zId="+id+" postId="+postId+" onclick='detail(this)'>详情</span>"
+			} else if (status == 2) {
+				status = "停用"
+				caozuo = "<span class='caozuo' zId="+id+" postId="+postId+" onclick='detail(this)'>详情</span>"
+			} else {
+				status = "草稿"
+				caozuo = "<span class='caozuo' zId="+id+" postId="+postId+" userTimes="+useTimes+" onclick='reStart(this)'>启用&emsp;</span><span class='caozuo' onclick='edit(this)'>编辑</span>"
+			}
+			
+			if(removeFlag==0){
+				var tr;
+				if (i % 2 == 0) {
+					tr = $("<tr style='background-color: #f7f7f7;'></tr>");
+				} else {
+					tr = $("<tr style='background-color: #ffffff;'></tr>");
+				}
+				tr.appendTo(table);
+				var temp = '<td> <input type="radio" class="zixiang" postId='+postId+' zId="'+id+'" name="banben" />&emsp; '
+						+ version
+						+ '</td>'
+						+ '<td>'
+						+ postName
+						+ '</td>'
+						+ '<td>'
+						+ createTime
+						+ '</td>'
+						+ '<td>'
+						+ createPerson
+						+ '</td>'
+						+ '<td>'
+						+ bigItemNum
+						+ '</td>'
+						+ '<td>'
+						+ totalItemNum
+						+ '</td>'
+						+ '<td>'
+						+ totalScore
+						+ '</td>'
+						+ '<td>'
+						+ useTimes
+						+ '</td>'
+						+ '<td>' + status + '</td>' + '<td>' + caozuo + '</td>'
+				tr.append(temp)
+			}
+			
+		}
+	}
+</script>
+</head>
+
+<body>
+	<!--右边上面选项区-->
+	<div class="main_xzk" style="height: 60px">
+		<div class="xzk">
+			<select class="xialakuang" id="ProfessionalSelect">
+				<option value=0 selected="selected">全部</option>
+			</select>
+		</div>
+		<div class="xzk">
+			<input name="" type="button" id="createTable"
+				onclick="onGetProfessional()" class="content_button"
+				onmouseover="this.className='content_button2'"
+				onmouseout="this.className='content_button'" value="查看评分表">
+		</div>
+	</div>
+	<!--右边下面表格内容区-->
+	<div class="biaogequ" style="min-height: 815px;">
+		<!--操作按钮区-->
+		<div class='top'>
+			<button class="top1" onclick="add1()">
+				<span>新增 </span>
+			</button>
+			<button class="top1" onclick="delete1()">
+				<span>删除 </span>
+			</button>
+			<button class="top1" onclick="copy1()">
+				<span>复制</span> </span>
+			</button>
+			<div class="xzk">
+			<select id="selectStatus"  class="xialakuang2" >
+			<option value="1">正常状态</option>
+			<option value="2">停用状态</option>
+			<option value="3">草稿状态</option>
+			</select>
+			<input name="" type="button" id="shaiXuanStatus"
+				onclick="onGetProfessional2()" class="content_button1"
+				onmouseover="this.className='content_button12'"
+				onmouseout="this.className='content_button1'" value="状态筛选">
+		</div>
+		</div>
+		
+		<div class="b" >
+		<div id="loading_image"  hidden="hidden" style="display:none;">
+	 	</div>
+			<div id="tableDiv">
+				<table class="box table" cellspacing="0" cellpadding="0"
+					id="dataTable">
+					<tr class="biaotou">
+						<th>版本号</th>
+						<th>专业名称</th>
+						<th>创建时间</th>
+						<th>创建人</th>
+						<th>评分大类数</th>
+						<th>评分项目总数</th>
+						<th>总分</th>
+						<th>使用次数</th>
+						<th>状态</th>
+						<th>操作</th>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

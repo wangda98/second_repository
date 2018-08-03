@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>个人技能评分趋势</title>
+<script type="text/javascript" src="../js/include.js"></script>
+<link href="../css/zhougongzuo.css" type="text/css" rel="stylesheet"/>
+<link href="../css/gerenbiaoxianqushichaxun.css" type="text/css" rel="stylesheet"/>
+<!-- hchart -->
+<script type="text/javascript" src="../js/hchart/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../js/hchart/highcharts.js"></script>
+<script type="text/javascript" src="../js/hchart/exporting.js"></script>
+<script type="text/javascript" src="../js/hchart/highcharts-zh_CN.js"></script>
+<script src="../js/BeAlert.js"></script>
+<link href="../css/BeAlert2.css" type="text/css" rel="stylesheet"/>
+<script>
+
+	var chartData;
+	var chart;
+	var name="";	
+	//格式化时间
+	Date.prototype.Format = function(fmt) { //author: meizz 
+		var o = {
+			"M+" : this.getMonth() + 1, //月份 
+			"d+" : this.getDate(), //日 
+			"H+" : this.getHours(), //小时 
+			"m+" : this.getMinutes(), //分 
+			"s+" : this.getSeconds(), //秒 
+			"q+" : Math.floor((this.getMonth() + 3) / 3), //季度 
+			"S" : this.getMilliseconds()
+		//毫秒 
+		};
+		if (/(y+)/.test(fmt))
+			fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "")
+					.substr(4 - RegExp.$1.length));
+		for ( var k in o)
+			if (new RegExp("(" + k + ")").test(fmt))
+				fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k])
+						: (("00" + o[k]).substr(("" + o[k]).length)));
+		return fmt;
+	}
+	
+	$(function() {
+		onCyberPageLoad();
+	});
+
+	//页面加载时
+	function onCyberPageLoad() {
+		//获取员工
+ 		$.ajax({
+			type : "POST",
+			url : "../service/workanalysis/getUserPostInfo",
+			data : {},
+			success : function(r) {
+				if(r.code == 1){
+					//清空表单
+					$("#personTable tr").each(function(){
+						$(this).remove();
+					})
+					var table = $("#personTable");
+					for(var i in r.result){
+						var tr;
+						if(i%2==0)
+							tr=$("<tr style='background:#f5f5f5'></tr>");
+						else
+							tr=$("<tr></tr>");
+				        tr.appendTo(table);
+				        var td=$("<td style='text-align:left;'>"+ 
+			        		"<input type='radio' class='choosePerson' style='margin:0 10px 0 30px'"+
+			        		" name='choosePerson' value='"+r.result[i].realname+"'/>"+
+			        		r.result[i].realname+"</td>");
+				        td.appendTo(tr);
+					}
+				}else{
+					alert(r.msg);
+				}
+			}
+		}); 
+		
+		//加载时间
+		var now = new Date();
+		var nowTime = now.getTime();
+		var day = now.getDay();
+		var oneDayLong = 24 * 60 * 60 * 1000;
+		
+		var LastMondayTime = nowTime - (day + 6) * oneDayLong;
+		var LastSundayTime = nowTime + (0 - day) * oneDayLong;
+		
+		var monday = new Date(LastMondayTime).Format("yyyy-MM-dd");
+		var sunday = new Date(LastSundayTime).Format("yyyy-MM-dd");
+		
+		$("#startDate").val(monday);
+		$("#endDate").val(sunday);
+	}
+
+	
+	//点击过往一月按钮时
+	function onCyberGetLastMonthPersonalReport() {
+		var lastMonth = new Date();
+		lastMonth.setMonth(lastMonth.getMonth()-1);
+		$("#endDate").val(new Date().Format("yyyy-MM-dd"));
+		$("#startDate").val(lastMonth.Format("yyyy-MM-dd"));
+		
+		onCyberGenerateReport();
+	}
+	
+	//点击过往三月按钮时
+	function onCyberGetLast3MonthPersonalReport() {
+		var last3Month = new Date();
+		last3Month.setMonth(last3Month.getMonth()-3);
+		$("#endDate").val(new Date().Format("yyyy-MM-dd"));
+		$("#startDate").val(last3Month.Format("yyyy-MM-dd"));
+		
+		onCyberGenerateReport();
+	}
+	
+	//点击过往六月按钮时
+	function onCyberGetLast6MonthPersonalReport() {
+		var last6Month = new Date();
+		last6Month.setMonth(last6Month.getMonth()-6);
+		$("#endDate").val(new Date().Format("yyyy-MM-dd"));
+		$("#startDate").val(last6Month.Format("yyyy-MM-dd"));
+		
+		onCyberGenerateReport();
+	}
+
+
+	
+	//点击分项目报表切换标签
+	function onCyberSwitchReport(btn){
+		var reportNumber = $(btn).val();
+		$(".reportBtn").attr("disabled", false);
+		$(".reportBtn").css("background","#e4f3f6");
+		$(btn).attr("disabled", true);
+		$(btn).css("background","white");
+		createChart(chartData[reportNumber].data);
+	}
+
+	//点击生成趋势报表按钮时
+	function onCyberGenerateReport() {
+		var start_date = $("#startDate").val();
+		var end_date = $("#endDate").val();
+		//var post_id = $("#referenceLine").val();
+		$(".choosePerson").each(function(){
+			if($(this).attr("checked"))
+				name = $(this).val();
+		})
+		//alert(name);
+		if(name == "" || name == null){
+			return;
+		}
+		ajaxGetReport(start_date, end_date, name);
+	}
+	
+	//发送选择数据
+	function ajaxGetReport(start_date,end_date,name){
+		$.ajax({
+			type : "POST",
+			url : "../service/personSkill/showPersonChart",
+			data : {'name':name,'startTime':start_date,'endTime':end_date},
+			success : function(r) {
+				if(r.code == 1){
+					chartData = r.result;
+					createButton();
+					createChart(chartData[0].data);
+				}else{
+					alert(r.msg);
+				}
+			}
+		});
+	}
+	
+	//创建button
+	function createButton(){
+		//清除以前的btn
+		$(".reportBtn").remove();
+		for(var i=0;i<chartData.length;i++){
+			if(i==0){
+				var btn = $("<button class='reportBtn teb_ziti' onclick='onCyberSwitchReport(this)' value="
+						+i+" style='font-size:16px;padding: 0 7px;background:white'>"+chartData[i].postName+"</button>");
+			}else{
+				var btn = $("<button class='reportBtn teb_ziti' onclick='onCyberSwitchReport(this)' value="
+						+i+" style='font-size:16px;padding: 0 7px;'>"+chartData[i].postName+"</button>");
+			}
+			btn.appendTo($("#buttonDiv"));
+		}
+		$(".reportBtn").attr("disabled", false);
+		$(".reportBtn:eq(0)").attr("disabled", true);
+	}
+	
+	//创建表格
+	function createChart(personData){
+		initChart();
+		//alert(chart.series)
+		//填充x列 为周数据
+		for (var i in personData[0]) {
+			chart.xAxis.categories[i] = personData[0][i];
+		}
+		
+		chart.series[0] = {'name':name,'data':[]};
+		//填充数据
+		for(var i in personData[0]){
+			chart.series[0].data[i] = personData[1][i];
+		}
+		
+ 		showChart();
+	}
+	
+	//初始化表格
+	function initChart(){
+		chart = {
+				chart: {
+		            type: 'line'
+		        },
+		        title: {
+		            text: ''
+		        },
+		        xAxis: {
+		            categories: []
+		        },
+		        yAxis: {
+		            title: {
+		                text: '个人分数'
+		            }
+		        },
+		        plotOptions: {
+		            line: {
+		                dataLabels: {
+		                    enabled: false          // 开启数据标签
+		                },
+		                enableMouseTracking: true // 关闭鼠标跟踪，对应的提示框、点击事件会失效
+		            }
+		        },
+		        series: [],
+		        credits: {  
+		            enabled: false     //不显示LOGO 
+		        }  
+		    }
+	}
+	
+	function showChart(){
+		$('#container').highcharts(chart);
+	}
+</script>
+</head>
+<body>
+	<!--右边上面选项区-->
+    <div class="main_xzk h" style="height: 100px;">
+        <div class="xzk w">
+            <span class="ziti">起始日期</span>
+            <input class="input_box" type="date" id="startDate" value="" />
+        </div>
+        <div class="xzk w_60">
+            <span class="ziti">截止日期</span>
+            <input class="input_box" type="date" id="endDate" value="" />
+        </div>
+        <div class="xzk w_32">
+            <p class="ziti dianjiziti" onclick="onCyberGetLastMonthPersonalReport()">过往一月</p>
+            <p class="ziti dianjiziti" onclick="onCyberGetLast3MonthPersonalReport()">过往三月</p>
+            <p class="ziti dianjiziti" onclick="onCyberGetLast6MonthPersonalReport()">过往六月</p>
+        </div>
+        <div class="xzk">
+            <input name="" type="button" class="content_button"  onmouseover="this.className='content_button2'"
+             onmouseout="this.className='content_button'" id="createChart" onclick="onCyberGenerateReport()" value="生成趋势报表">
+        </div>
+    </div>
+	
+    <!--右边下面表格内容区-->
+    <div class="biaogequ" id="biaogequ" style="min-height: 775px;">
+        <div class="box">
+            <div id="tableDiv2">
+            	<span class="box3" style="width: 18%;height: 520px;overflow:auto;float: left;">
+            		<p class="spanP">员工选择表</p>
+	            	<table class="box4 table4" id="personTable" border="1" cellspacing="0" cellpadding="0"></table>
+            	</span>
+            	<span class="box3" style="width: 74%">
+            		<p class="spanP">趋势报表</p>
+            		<div class="box_bg" id="buttonDiv" style="margin-top: 10px;">
+		           		<!-- <button class="reportBtn teb_ziti" onclick="onCyberSwitchReport(this)" style="width: 25%;" value="1">任务负载率</button> -->
+		            </div>
+		            <div class="box border">
+		            	<div id="container" style="height:400px"></div>
+		            </div>
+            	</span>
+            </div>
+    	</div> 
+    </div>
+</body>
+</html>

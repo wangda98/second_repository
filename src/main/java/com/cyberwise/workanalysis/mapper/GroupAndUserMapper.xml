@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyberwise.workanalysis.mapper.GroupAndUserMapper">
+  <resultMap id="BaseResultMap" type="com.cyberwise.workanalysis.bean.GroupAndUser">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="group_id" jdbcType="INTEGER" property="groupId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="is_leader" jdbcType="INTEGER" property="isLeader" />
+    <result column="removed_flag" jdbcType="INTEGER" property="removedFlag" />
+    <result column="create_time" jdbcType="DATE" property="createTime" />
+    <result column="leave_time" jdbcType="DATE" property="leaveTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, group_id, user_id, is_leader, removed_flag, create_time, leave_time
+  </sql>
+  <select id="selectByExample" parameterType="com.cyberwise.workanalysis.bean.GroupAndUserExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tb_cyber_group_user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_cyber_group_user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tb_cyber_group_user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cyberwise.workanalysis.bean.GroupAndUserExample">
+    delete from tb_cyber_group_user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cyberwise.workanalysis.bean.GroupAndUser">
+    insert into tb_cyber_group_user (id, group_id, user_id, 
+      is_leader, removed_flag, create_time, 
+      leave_time)
+    values (#{id,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
+      #{isLeader,jdbcType=INTEGER}, #{removedFlag,jdbcType=INTEGER}, #{createTime,jdbcType=DATE}, 
+      #{leaveTime,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cyberwise.workanalysis.bean.GroupAndUser">
+    insert into tb_cyber_group_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="groupId != null">
+        group_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="isLeader != null">
+        is_leader,
+      </if>
+      <if test="removedFlag != null">
+        removed_flag,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="leaveTime != null">
+        leave_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="groupId != null">
+        #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="isLeader != null">
+        #{isLeader,jdbcType=INTEGER},
+      </if>
+      <if test="removedFlag != null">
+        #{removedFlag,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=DATE},
+      </if>
+      <if test="leaveTime != null">
+        #{leaveTime,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cyberwise.workanalysis.bean.GroupAndUserExample" resultType="java.lang.Long">
+    select count(*) from tb_cyber_group_user
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update tb_cyber_group_user
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.groupId != null">
+        group_id = #{record.groupId,jdbcType=INTEGER},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=INTEGER},
+      </if>
+      <if test="record.isLeader != null">
+        is_leader = #{record.isLeader,jdbcType=INTEGER},
+      </if>
+      <if test="record.removedFlag != null">
+        removed_flag = #{record.removedFlag,jdbcType=INTEGER},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=DATE},
+      </if>
+      <if test="record.leaveTime != null">
+        leave_time = #{record.leaveTime,jdbcType=DATE},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update tb_cyber_group_user
+    set id = #{record.id,jdbcType=INTEGER},
+      group_id = #{record.groupId,jdbcType=INTEGER},
+      user_id = #{record.userId,jdbcType=INTEGER},
+      is_leader = #{record.isLeader,jdbcType=INTEGER},
+      removed_flag = #{record.removedFlag,jdbcType=INTEGER},
+      create_time = #{record.createTime,jdbcType=DATE},
+      leave_time = #{record.leaveTime,jdbcType=DATE}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cyberwise.workanalysis.bean.GroupAndUser">
+    update tb_cyber_group_user
+    <set>
+      <if test="groupId != null">
+        group_id = #{groupId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="isLeader != null">
+        is_leader = #{isLeader,jdbcType=INTEGER},
+      </if>
+      <if test="removedFlag != null">
+        removed_flag = #{removedFlag,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=DATE},
+      </if>
+      <if test="leaveTime != null">
+        leave_time = #{leaveTime,jdbcType=DATE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cyberwise.workanalysis.bean.GroupAndUser">
+    update tb_cyber_group_user
+    set group_id = #{groupId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=INTEGER},
+      is_leader = #{isLeader,jdbcType=INTEGER},
+      removed_flag = #{removedFlag,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=DATE},
+      leave_time = #{leaveTime,jdbcType=DATE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!-- 查询在组成员的信息 --> 
+  <select id="queryByGroupId" parameterType="int" resultType="com.cyberwise.workanalysis.bean.GroupAndUserValue">
+  select u.realname, g.group_name,g.group_type, gu.* from tb_cyber_group as g,zt_user as u,tb_cyber_group_user as gu WHERE g.id=gu.group_id and u.id=gu.user_id and g.id=#{id} ORDER BY gu.removed_flag
+   </select>
+ 	<!-- 查询在组成员的信息 --> 
+  <select id="queryAllMember" resultType="com.cyberwise.workanalysis.bean.GroupAndUserValue">
+select u.realname, g.group_name,g.group_type, gu.* from tb_cyber_group as g,zt_user as u,tb_cyber_group_user as gu WHERE g.id=gu.group_id and u.id=gu.user_id ORDER BY gu.group_id ASC
+  </select>
+  <!-- 模糊查询组成员的信息 --> 
+  <select id="likequery" resultType="com.cyberwise.workanalysis.bean.ZtUser">
+select distinct u.id,u.realname from zt_user as u WHERE u.realname LIKE CONCAT('%',#{realname},"%")  </select>
+</mapper>

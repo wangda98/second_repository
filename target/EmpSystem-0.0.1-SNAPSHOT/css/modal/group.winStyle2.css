@@ -1,0 +1,137 @@
+.m-modal2 {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display: none;
+	z-index: 700;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, .2);
+}
+
+.m-modal-dialog2 {
+	font-family: "microsoft yahei", "宋体";
+	position: relative;
+	margin: 0 auto;
+	margin-top: -100%;
+	width: 400px;
+	height: 270px;
+	background-color: #ffffff;
+	box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+}
+
+.m-top2 {
+	background-color: #30A9DE;
+}
+
+.m-modal-title2 {
+	margin: 0;
+	color: #fff;
+	padding: 10px 20px 10px 20px;
+	font-size: 20px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.m-modal-close2 {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	display: inline-block;
+	font-size: 35px;
+	line-height: 20px;
+	color: #555;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	color: #fff;
+}
+
+.m-modal-close2:hover  {
+	color: #555;
+}
+
+.m-middle2 {
+	padding: 10px 20px 10px 20px;
+}
+
+.m-bottom2 {
+	padding: 0 6px 6px;
+	overflow: hidden;
+}
+
+.m-bottom2 button {
+	font-family: "microsoft yahei", "宋体";
+	cursor: pointer;
+	border: 1px solid #ccc;
+	background-color: #fff;
+	padding: 5px 15px;
+	float: right;
+	margin: 0 0 0 10px;
+	outline: none;
+	font-size: 14px;
+	color: #333;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.m-bottom2 button:hover {
+	color: #333;
+	background-color: #e6e6e6;
+	border-color: #adadad;
+}
+
+.m-bottom2 button:active {
+	color: #333;
+	background-color: #d4d4d4;
+	border-color: #8c8c8
+}
+
+.m-bottom2 .m-btn-sure2 {
+	color: #fff;
+	background-color: #04b8dc;
+	border-color: #17b6d6;
+	border-radius: 6px;
+	margin-right: 10px;
+	padding: 6px 20px;
+}
+
+.m-bottom2 .m-btn-sure2:hover {
+	color: #fff;
+	background-color: #286090;
+	border-color: #204d74;
+}
+
+.m-bottom2 .m-btn-sure2:active {
+	color: #fff;
+	background-color: #204d74;
+	border-color: #122b40;
+}
+
+.m-bottom2 .m-btn-cancel2 {
+	color: #fff;
+	background-color: #f45959;
+	border-color: #fb6666;
+	border-radius: 6px;
+	margin-right: 10px;
+	padding: 6px 20px;
+}
+
+.m-bottom2 .m-btn-cancel2:hover {
+	color: #fff;
+	background-color: #d50000;
+	border-color: #d50000;
+}
+
+.m-bottom2 .m-btn-cancel2:active {
+	color: #fff;
+	background-color: #b50000;
+	border-color: #b50000;
+}
